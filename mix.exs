@@ -7,9 +7,9 @@ defmodule RaiEx.Mixfile do
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
-      deps: deps()
-      docs: docs()
-      source_url: "https://github.com/willHol/rai_ex"
+      deps: deps(),
+      docs: docs(),
+      source_url: "https://github.com/willHol/rai_ex",
       name: "RaiEx"
     ]
   end
