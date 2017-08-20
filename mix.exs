@@ -8,6 +8,9 @@ defmodule RaiEx.Mixfile do
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps()
+      docs: docs()
+      source_url: "https://github.com/willHol/rai_ex"
+      name: "RaiEx"
     ]
   end
 
@@ -19,11 +22,18 @@ defmodule RaiEx.Mixfile do
     ]
   end
 
+  def docs do
+    [
+      extras: ["README.md"]
+    ]
+  end
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:poison, "~> 3.1"},
-      {:httpoison, "~> 0.13.0"}
+      {:httpoison, "~> 0.13.0"},
+      {:ex_doc, "~> 0.16.2", only: :dev, runtime: false}
     ]
   end
 end
