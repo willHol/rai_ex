@@ -1,10 +1,10 @@
-RaiEx.connect "localhost:7075"
+RaiEx.connect "localhost"
 
 # Create a wallet for user
 {:ok, %{"wallet" => wallet}} = RaiEx.wallet_create
 
 # # Generate deterministic seed for wallet - 256 bits
-# seed = :crypto.strong_rand_bytes(7) |> Base.encode16
+<< int :: size(16) >> = :crypto.strong_rand_bytes(8)
 
 # # Set the seed
 # {:ok, %{"success" => _}} = RaiEx.wallet_change_seed(wallet, seed)

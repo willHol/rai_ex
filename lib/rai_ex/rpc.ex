@@ -19,11 +19,12 @@ defmodule RPC do
 			function_name = unquote(action)
 
 			def unquote(action)(unquote_splicing(args)) when true do
-				Enum.zip(Map.keys(unquote(map_macro)), unquote(args))
+				# Reverse the keys as they are in wrong order
+				Enum.zip(Enum.reverse(Map.keys(unquote(map_macro))), unquote(args))
 				|> Enum.into(%{})
 				|> Map.put("action", unquote(action))
 				|> Poison.encode!
-    		|> post_json_rpc
+    			|> post_json_rpc
 			end
 		end
 	end

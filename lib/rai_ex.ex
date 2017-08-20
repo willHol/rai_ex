@@ -667,12 +667,24 @@ defmodule RaiEx do
     param "password", :string
   end
 
+  # def password_enter(wallet, password) do
+  #   map = %{
+  #     "action" => "password_enter",
+  #     "wallet" => wallet,
+  #     "password" => password
+  #   }
+
+  #   map
+  #   |> Poison.encode!
+  #   |> post_json_rpc
+  # end
+
   @doc """
   Checks whether the password entered for wallet is valid.
   """
   rpc :password_valid do
     param "wallet", :string
-    param "wallet", :string
+    param "password", :string
   end
 
   @doc """
@@ -774,7 +786,7 @@ defmodule RaiEx do
   # Posts the message to the node and decodes the response
   defp post_json_rpc(json) do
     with {:ok, %Response{status_code: 200, body: body}} <- post(get_url(), json, @headers),
-         {:ok, map} <- Poison.decode(body)
+         {:ok, map} <- (IO.puts(body); Poison.decode(body))
          do
            {:ok, map}
          else
