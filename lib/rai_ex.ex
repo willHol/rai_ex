@@ -667,18 +667,6 @@ defmodule RaiEx do
     param "password", :string
   end
 
-  # def password_enter(wallet, password) do
-  #   map = %{
-  #     "action" => "password_enter",
-  #     "wallet" => wallet,
-  #     "password" => password
-  #   }
-
-  #   map
-  #   |> Poison.encode!
-  #   |> post_json_rpc
-  # end
-
   @doc """
   Checks whether the password entered for wallet is valid.
   """
