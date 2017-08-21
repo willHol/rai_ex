@@ -1,14 +1,15 @@
 defmodule RaiEx do
   import HTTPoison
-  alias HTTPoison.Response
   use RPC
 
-  @default_port "7075"
+  alias HTTPoison.Response
+
+  @default_port "7076"
   @headers [{"Content-Type", "application/json"}]
 
-  def connect(url \\ "http://localhost:7075") do
+  def connect(url \\ "http://localhost:7076") do
     :ets.new(:params, [:named_table])
-    true = :ets.insert(:params, [{:url, parse_url(url)}])
+    :ets.insert(:params, [{:url, parse_url(url)}])
     :ok
   end
 
