@@ -39,29 +39,9 @@ defmodule RPC do
 				|> Enum.into(%{})
 				|> Map.put("action", unquote(action))
 				|> Poison.encode!
-    			|> post_json_rpc
+    		|> post_json_rpc
 			end
 		end
-	end
-
-	# Gathers the params and types into a map of the form:
-	#
-	# %{
-	#	<param1> => <type1>
-	#   <param2> => <type2>
-	# }
-	defp param_to_type(definition) do
-		{_tree, map} = Macro.prewalk(definition, %{},
-			fn pre, map -> 
-				case pre do
-				{:param, _line, [param, type]} ->
-					{pre, Map.put(map, param, type)}
-				_ ->
-					{pre, map}
-			end
-		end)
-
-		map
 	end
 
 	# Gathers a list of params, in the defined order.

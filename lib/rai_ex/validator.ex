@@ -7,6 +7,7 @@ defmodule Validator do
 		:wallet => {__MODULE__, :is_hash},
 		:hash => {__MODULE__, :is_hash},
 		:hash_list => {__MODULE__, :is_hash_list},
+		:block => {__MODULE__, :is_hash},
 		:address => {__MODULE__, :is_address},
 		:address_list => {__MODULE__, :is_address_list}
 	}
@@ -23,7 +24,12 @@ defmodule Validator do
 		end)
 
 		if Enum.count(invalid_args) > 0 do
-			raise ArgumentError, message: "Invalid arguments: #{invalid_args}"
+			raise ArgumentError,
+			message: """
+
+			Invalid arguments: #{inspect invalid_args}
+			Types should be: #{inspect types}
+			"""
 		end
 	end
 

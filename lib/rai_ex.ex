@@ -1,16 +1,13 @@
 defmodule RaiEx do
   import HTTPoison
   use RPC
-
   alias HTTPoison.Response
+  alias HTTPoison.Error
 
-  @default_port "7076"
   @headers [{"Content-Type", "application/json"}]
 
   def connect(url \\ "http://localhost:7076") do
-    :ets.new(:params, [:named_table])
-    :ets.insert(:params, [{:url, parse_url(url)}])
-    :ok
+    Application.put_env(:rai_ex, :url, parse_url(url))
   end
 
   @doc """
@@ -209,7 +206,7 @@ defmodule RaiEx do
   Returns a list of block hashes in the account chain starting at `block` up to `count`.
   """
   rpc :chain do
-    param "block", :string
+    param "block", :block
     param "count", :integer
   end
 
@@ -358,7 +355,7 @@ defmodule RaiEx do
   Publish `block` to the network.
   """
   rpc :process do
-    param "block", :string
+    param "block", :block
   end
 
   @doc """
@@ -369,7 +366,7 @@ defmodule RaiEx do
   rpc :receive do
     param "wallet", :wallet
     param "account", :address
-    param "block", :string
+    param "block", :block
   end
 
   @doc """
@@ -465,7 +462,7 @@ defmodule RaiEx do
   Returns a list of block hashes in the account chain ending at block up to count.
   """
   rpc :successors do
-    param "block", :string
+    param "block", :block
     param "count", :number
   end
 
@@ -758,27 +755,26 @@ defmodule RaiEx do
 
   defp parse_url(url) do
     case String.splitter(url, ["://", ":"]) |> Enum.take(3) do
-      ["http", "localhost", port] -> "http://" <> "127.0.0.1" <> ":" <> port
-      ["http", host, port] -> "http://" <> host <> ":" <> port
-      ["http", host] -> "http://" <> host <> ":" <> @default_port
-      [host, port] -> "http://" <> host <> ":" <> port
-      [host] -> "http://" <> host <> ":" <> @default_port
+      ["http", "localhost", port] -> "http://#{local_host()}:#{port}"
+      ["http", host, port] -> "http://#{host}:#{port}"
+      ["http", host] -> "http://#{host}:#{default_port()}"
+      [host, port] -> "http://#{host}:#{port}"
+      [host] -> "http://#{host}:#{default_port()}"
     end
   end
 
+  defp default_port, do: Application.get_env(:rai_ex, :default_port, 7075)
+
+  defp local_host, do: Application.get_env(:rai_ex, :localhost, "127.0.0.1")
+
   defp get_url do
-    [{:url, url}] = :ets.lookup(:params, :url)
-    url
+    Application.get_env(:rai_ex, :url)
   end
 
   # Posts the message to the node and decodes the response
   defp post_json_rpc(json) do
     with {:ok, %Response{status_code: 200, body: body}} <- post(get_url(), json, @headers),
          {:ok, map} <- Poison.decode(body)
-         do
-           {:ok, map}
-         else
-           {:error, val} -> {:error, val}
-         end
+         do {:ok, map} else {:error, %Error{reason: reason}} -> {:error, reason} end
   end
 end
