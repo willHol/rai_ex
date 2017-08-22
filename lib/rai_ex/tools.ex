@@ -17,13 +17,9 @@ defmodule RaiEx.Tools do
 			 	 do {:ok, wallet} else {:ok, reason} -> {:error, reason} end
 	end
 
-	def wallet_create_encrypted(password) do
-		{:ok, %{"wallet" => wallet}} = RaiEx.wallet_create
-
-		# Delay so the wallet is registered
-		:timer.sleep(@delay)
-			   
-		with {:ok, ^wallet} <- change_password(wallet, "", password)
+	def wallet_create_encrypted(password) do			   
+		with {:ok, %{"wallet" => wallet}} <- RaiEx.wallet_create,
+				 {:ok, ^wallet} <- (:timer.sleep(@delay); change_password(wallet, "", password))
 			   do {:ok, wallet} else {:ok, reason} -> {:error, reason} end
 	end
 

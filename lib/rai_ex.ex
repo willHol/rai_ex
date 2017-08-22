@@ -5,8 +5,9 @@ defmodule RaiEx do
   alias HTTPoison.Error
 
   @headers [{"Content-Type", "application/json"}]
+  @default_url "http://localhost:7076"
 
-  def connect(url \\ "http://localhost:7076") do
+  def connect(url \\ @default_url) do
     Application.put_env(:rai_ex, :url, parse_url(url))
   end
 
@@ -768,7 +769,7 @@ defmodule RaiEx do
   defp local_host, do: Application.get_env(:rai_ex, :localhost, "127.0.0.1")
 
   defp get_url do
-    Application.get_env(:rai_ex, :url)
+    Application.get_env(:rai_ex, :url, @default_url)
   end
 
   # Posts the message to the node and decodes the response
