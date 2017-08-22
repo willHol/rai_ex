@@ -6,20 +6,25 @@ defmodule Validator do
 		:list => {Kernel, :is_list},
 		:wallet => {__MODULE__, :is_hash},
 		:hash => {__MODULE__, :is_hash},
-		:hash_list => {__MODULE__, :is_hash_list}
+		:hash_list => {__MODULE__, :is_hash_list},
 		:address => {__MODULE__, :is_address},
 		:address_list => {__MODULE__, :is_address_list}
 	}
 
 	def validate_types(arg_values, types) do
-		Enum.zip(arg_values, types)
-		|> Enum.each(fn {arg, type} ->
+		invalid_args = Enum.zip(arg_values, types) |> Enum.reduce([] ,fn {arg, type}, list ->
 			{mod, fun} = @type_checkers[type]
-
+			
 			if not apply(mod, fun, [arg]) do
-				raise ArgumentError, message: "Invalid argument."
+				[arg | list]
+			else
+				list
 			end
 		end)
+
+		if Enum.count(invalid_args) > 0 do
+			raise ArgumentError, message: "Invalid arguments: #{invalid_args}"
+		end
 	end
 
 	def is_hash(wallet) do
