@@ -24,12 +24,12 @@ defmodule RPC do
     "wallet" does not pass the :string type check, an Argument error will be raised.
 	"""
 	defmacro rpc(action, do: definition) when is_atom(action) do
-		params_to_types = param_to_type(definition)
-		params_list_quoted = param_list(definition) |> Macro.escape
+		params_list = param_list(definition)
+		params_list_quoted = params_list |> Macro.escape
 
 		types_list_quoted = type_list(definition) |> Macro.escape
 
-		args = create_args(__MODULE__, Enum.count(params_to_types))
+		args = create_args(__MODULE__, Enum.count(params_list))
 
 		quote do
 			def unquote(action)(unquote_splicing(args)) do
@@ -120,8 +120,8 @@ defmodule RPC do
 
 	# Creates a dynamic arguments list, where each argument
 	# is a variable instead of a constant.
-	def create_args(_, 0),
+	defp create_args(_, 0),
 	  do: []
-	def create_args(fn_mdl, arg_cnt),
+	defp create_args(fn_mdl, arg_cnt),
 	  do: Enum.map(1..arg_cnt, &(Macro.var (:"arg#{&1}"), fn_mdl))
 end

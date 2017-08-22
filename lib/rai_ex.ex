@@ -17,14 +17,14 @@ defmodule RaiEx do
   Returns how many RAW is owned and how many have not yet been received by `account`.
   """
   rpc :account_balance do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
   Gets the number of blocks for a specific `account`.
   """
   rpc :account_block_count do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
@@ -32,14 +32,14 @@ defmodule RaiEx do
   last modified timestamp from local database & block count for `account`.
   """
   rpc :account_info do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
   Creates a new account, insert next deterministic key in `wallet`.
   """
   rpc :account_create do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -53,7 +53,7 @@ defmodule RaiEx do
   Reports send/receive information for an `account`.
   """
   rpc :account_history do
-    param "account", :string
+    param "account", :address
     param "count", :integer
   end
 
@@ -61,7 +61,7 @@ defmodule RaiEx do
   Lists all the accounts inside `wallet`.
   """
   rpc :account_list do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -70,31 +70,31 @@ defmodule RaiEx do
   # Node must have 'enable_control' set to 'true'
   """
   rpc :account_move do
-    param "wallet", :string
-    param "source", :string
-    param "accounts", :list
+    param "wallet", :wallet
+    param "source", :address
+    param "accounts", :address_list
   end
 
   @doc """
   Get the `public key` for `account`.
   """
   rpc :account_key do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
   Remove `account` from `wallet`.
   """
   rpc :account_remove do
-    param "wallet", :string
-    param "account", :string
+    param "wallet", :wallet
+    param "account", :address
   end
 
   @doc """
   Returns the representative for `account`.
   """
   rpc :account_representative do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
@@ -103,8 +103,8 @@ defmodule RaiEx do
   # Node must have 'enable_control' set to 'true'
   """
   rpc :account_representative_set do
-    param "wallet", :string
-    param "account", :string
+    param "wallet", :wallet
+    param "account", :address
     param "representative", :string
   end
 
@@ -112,21 +112,21 @@ defmodule RaiEx do
   Returns the voting weight for `account`.
   """
   rpc :account_weight do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
   Returns how many RAW is owned and how many have not yet been received by accounts list.
   """
   rpc :accounts_balances do
-    param "accounts", :list
+    param "accounts", :address_list
   end
 
   @doc """
   Returns a list of pairs of account and block hash representing the head block for `accounts`.
   """
   rpc :accounts_frontiers do
-    param "accounts", :list
+    param "accounts", :address_list
   end
 
   @doc """
@@ -135,12 +135,12 @@ defmodule RaiEx do
   # Optional `threshold`, only returns hashes with amounts >= threshold.
   """
   rpc :accounts_pending do
-    param "accounts", :list
+    param "accounts", :address_list
     param "count", :integer
   end
 
   rpc :accounts_pending do
-    param "accounts", :list
+    param "accounts", :address_list
     param "count", :integer
     param "threshold", :number
   end
@@ -155,28 +155,28 @@ defmodule RaiEx do
   Retrieves a json representation of `block`.
   """
   rpc :block do
-    param "hash", :string
+    param "hash", :hash
   end
 
   @doc """
   Retrieves a json representations of multiple `blocks`.
   """
   rpc :blocks do
-    param "hashes", :list
+    param "hashes", :hash_list
   end
 
   @doc """
   Retrieves a json representations of `blocks` with transaction `amount` & block `account`.
   """
   rpc :blocks_info do
-    param "hashes", :list
+    param "hashes", :hash_list
   end
 
   @doc """
   Returns the `account` containing the `block`.
   """
   rpc :block_account do
-    param "hash", :string
+    param "hash", :hash
   end
 
   @doc """
@@ -217,14 +217,14 @@ defmodule RaiEx do
   Returns a list of pairs of delegator names given `account` a representative and its balance.
   """
   rpc :delegators do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
   Get number of delegators for a specific representative `account`.
   """
   rpc :delegators_count do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
@@ -239,7 +239,7 @@ defmodule RaiEx do
   Returns a list of pairs of account and block hash representing the head block starting at account up to count.
   """
   rpc :frontiers do
-    param "account", :string
+    param "account", :address
     param "count", :integer
   end
 
@@ -253,7 +253,7 @@ defmodule RaiEx do
   Reports send/receive information for a chain of blocks.
   """
   rpc :history do
-    param "hash", :string
+    param "hash", :hash
     param "count", :integer
   end
 
@@ -327,29 +327,29 @@ defmodule RaiEx do
   a new account is created, placed in the wallet, and returned.
   """
   rpc :payment_begin do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
   Marks all accounts in wallet as available for being used as a payment session.
   """
   rpc :payment_init do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
   End a payment session. Marks the account as available for use in a payment session. 
   """
   rpc :payment_end do
-    param "account", :string
-    param "wallet", :string
+    param "account", :address
+    param "wallet", :wallet
   end
 
   @doc """
   Wait for payment of 'amount' to arrive in 'account' or until 'timeout' milliseconds have elapsed.
   """
   rpc :payment_wait do
-    param "account", :string
+    param "account", :address
     param "amount", :number
     param "timeout", :number
   end
@@ -367,8 +367,8 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :receive do
-    param "wallet", :string
-    param "account", :string
+    param "wallet", :wallet
+    param "account", :address
     param "block", :string
   end
 
@@ -397,7 +397,7 @@ defmodule RaiEx do
   Returns the default representative for `wallet`.
   """
   rpc :wallet_representative do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -406,7 +406,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :wallet_representative_set do
-    param "wallet", :string
+    param "wallet", :wallet
     param "representative", :string
   end
 
@@ -414,14 +414,14 @@ defmodule RaiEx do
   Rebroadcast blocks starting at `hash` to the network.
   """
   rpc :republish do
-    param "hash", :string
+    param "hash", :hash
   end
 
   @doc """
   Additionally rebroadcast source chain blocks for receive/open up to `sources` depth.
   """
   rpc :republish do
-    param "hash", :string
+    param "hash", :hash
     param "sources", :integer
   end
 
@@ -429,7 +429,7 @@ defmodule RaiEx do
   Tells the node to look for pending blocks for any account in `wallet`.
   """
   rpc :search_pending do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -442,8 +442,8 @@ defmodule RaiEx do
   Send `amount` from `source` in `wallet` to destination
   """
   rpc :send do
-    param "wallet", :string
-    param "source", :string
+    param "wallet", :wallet
+    param "source", :address
     param "destination", :string
     param "amount", :number
   end
@@ -458,7 +458,7 @@ defmodule RaiEx do
   Check whether account is a valid account number.
   """
   rpc :validate_account_number do
-    param "account", :string
+    param "account", :address
   end
 
   @doc """
@@ -485,7 +485,7 @@ defmodule RaiEx do
   Returns a list of block hashes which have not yet been received by this account.
   """
   rpc :pending do
-    param "account", :string
+    param "account", :address
     param "count", :integer
   end
 
@@ -493,7 +493,7 @@ defmodule RaiEx do
   Returns a list of pending block hashes with amount more or equal to threshold.
   """
   rpc :pending do
-    param "account", :string
+    param "account", :address
     param "count", :integer
     param "threshold", :number
   end
@@ -502,7 +502,7 @@ defmodule RaiEx do
   Check whether block is pending by hash.
   """
   rpc :pending_exists do
-    param "hash", :string
+    param "hash", :hash
   end
 
   @doc """
@@ -524,7 +524,7 @@ defmodule RaiEx do
   Retrieves a json representation of unchecked synchronizing block by hash.
   """
   rpc :unchecked_get do
-    param "hash", :string
+    param "hash", :hash
   end
 
   @doc """
@@ -541,7 +541,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :wallet_add do
-    param "wallet", :string
+    param "wallet", :wallet
     param "key", :string
   end
 
@@ -549,14 +549,14 @@ defmodule RaiEx do
   Returns the sum of all accounts balances in wallet.
   """
   rpc :wallet_balance_total do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
   Returns how many rai is owned and how many have not yet been received by all accounts in .
   """
   rpc :wallet_balances do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -565,7 +565,7 @@ defmodule RaiEx do
   ## enable_control must be set to true  
   """
   rpc :wallet_change_seed do
-    param "wallet", :string
+    param "wallet", :wallet
     param "seed", :string
   end
 
@@ -573,8 +573,8 @@ defmodule RaiEx do
   Check whether wallet contains account.
   """
   rpc :wallet_contains do
-    param "wallet", :string
-    param "account", :string
+    param "wallet", :wallet
+    param "account", :address
   end
 
   @doc """
@@ -591,14 +591,14 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :wallet_destroy do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
   Return a json representation of wallet.
   """
   rpc :wallet_export do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -606,7 +606,7 @@ defmodule RaiEx do
   for accounts from wallet.
   """
   rpc :wallet_frontiers do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -615,7 +615,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :wallet_pending do
-    param "wallet", :string
+    param "wallet", :wallet
     param "count", :integer
   end
 
@@ -625,7 +625,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :wallet_pending do
-    param "wallet", :string
+    param "wallet", :wallet
     param "count", :integer
     param "threshold", :number
   end
@@ -636,7 +636,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :wallet_republish do
-    param "wallet", :string
+    param "wallet", :wallet
     param "count", :integer
   end
 
@@ -646,7 +646,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :wallet_work_get do
-    param "wallet", :string
+    param "wallet", :wallet
   end
 
   @doc """
@@ -655,7 +655,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :password_change do
-    param "wallet", :string
+    param "wallet", :wallet
     param "password", :string
   end
 
@@ -663,7 +663,7 @@ defmodule RaiEx do
   Enters the password in to wallet.
   """
   rpc :password_enter do
-    param "wallet", :string
+    param "wallet", :wallet
     param "password", :string
   end
 
@@ -671,7 +671,7 @@ defmodule RaiEx do
   Checks whether the password entered for wallet is valid.
   """
   rpc :password_valid do
-    param "wallet", :string
+    param "wallet", :wallet
     param "password", :string
   end
 
@@ -681,7 +681,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :work_cancel do
-    param "hash", :string
+    param "hash", :hash
   end
 
   @doc """
@@ -690,7 +690,7 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :work_generate do
-    param "hash", :string
+    param "hash", :hash
   end
 
   @doc """
@@ -699,8 +699,8 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :work_get do
-    param "wallet", :string
-    param "account", :string
+    param "wallet", :wallet
+    param "account", :address
   end
 
   @doc """
@@ -709,8 +709,8 @@ defmodule RaiEx do
   ## enable_control must be set to true
   """
   rpc :work_set do
-    param "wallet", :string
-    param "account", :string
+    param "wallet", :wallet
+    param "account", :address
     param "work", :string
   end
 
@@ -745,7 +745,7 @@ defmodule RaiEx do
   """
   rpc :work_validate do
     param "work", :string
-    param "hash", :string
+    param "hash", :hash
   end
 
   # @doc """
