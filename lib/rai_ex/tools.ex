@@ -32,9 +32,9 @@ defmodule RaiEx.Tools do
 
   def unlock_wallet(wallet, password) do
     case RaiEx.password_enter(wallet, password) do
-      {:ok, %{"valid" => 1}} ->
+      {:ok, %{"valid" => "1"}} ->
 				{:ok, wallet}
-      {:ok, %{"valid" => 0}} ->
+      {:ok, %{"valid" => "0"}} ->
         {:error, :invalid}
       {:error, reason} ->
         {:error, reason}
