@@ -433,7 +433,7 @@ defmodule RaiEx do
   @doc """
   Tells the node to look for pending blocks for any account in all available wallets.
   """
-  rpc :seach_pending_all do
+  rpc :search_pending_all do
   end
 
   @doc """
