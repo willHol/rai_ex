@@ -30,6 +30,15 @@ defmodule RaiEx.Tools do
 			   do {:ok, %{"private" => priv, "public" => pub, "account" => acc}} else {_, reason} -> {:error, reason} end
 	end
 
+  def unlock_wallet(wallet, password) do
+    case RaiEx.password_enter(wallet, password) do
+      {:ok, %{"valid" => 1}} ->
+				{:ok, wallet}
+      {:error, reason} ->
+				{:error, :reason}
+    end
+  end
+
   def lock_wallet(wallet) do
     case RaiEx.password_enter(wallet, "") do
       {:ok, _} -> :ok
