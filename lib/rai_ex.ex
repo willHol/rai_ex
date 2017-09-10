@@ -336,7 +336,7 @@ defmodule RaiEx do
   end
 
   @doc """
-  End a payment session. Marks the account as available for use in a payment session. 
+  End a payment session. Marks the account as available for use in a payment session.
   """
   rpc :payment_end do
     param "account", :address
@@ -560,7 +560,7 @@ defmodule RaiEx do
   @doc """
   Changes seed for wallet to seed.
 
-  ## enable_control must be set to true  
+  ## enable_control must be set to true
   """
   rpc :wallet_change_seed do
     param "wallet", :wallet
@@ -609,7 +609,7 @@ defmodule RaiEx do
 
   @doc """
   Returns a list of block hashes which have not yet been received by accounts in this wallet.
-  
+
   ## enable_control must be set to true
   """
   rpc :wallet_pending do
@@ -619,7 +619,7 @@ defmodule RaiEx do
 
   @doc """
   Returns a list of pending block hashes with amount more or equal to threshold.
-  
+
   ## enable_control must be set to true
   """
   rpc :wallet_pending do
@@ -630,7 +630,7 @@ defmodule RaiEx do
 
   @doc """
   Rebroadcast blocks for accounts from wallet starting at frontier down to count to the network.
-  
+
   ## enable_control must be set to true
   """
   rpc :wallet_republish do
@@ -640,7 +640,7 @@ defmodule RaiEx do
 
   @doc """
   Returns a list of pairs of account and work from wallet.
-  
+
   ## enable_control must be set to true
   """
   rpc :wallet_work_get do
@@ -670,7 +670,6 @@ defmodule RaiEx do
   """
   rpc :password_valid do
     param "wallet", :wallet
-    param "password", :string
   end
 
   @doc """
