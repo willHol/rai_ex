@@ -34,8 +34,10 @@ defmodule RaiEx.Tools do
     case RaiEx.password_enter(wallet, password) do
       {:ok, %{"valid" => 1}} ->
 				{:ok, wallet}
+      {:ok, %{"valid" => 0}} ->
+        {:error, :invalid}
       {:error, reason} ->
-				{:error, :reason}
+        {:error, reason}
     end
   end
 
