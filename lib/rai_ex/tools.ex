@@ -29,4 +29,12 @@ defmodule RaiEx.Tools do
 			   {:ok, %{"account" => ^acc}} <- RaiEx.wallet_add(wallet, priv)
 			   do {:ok, %{"private" => priv, "public" => pub, "account" => acc}} else {_, reason} -> {:error, reason} end
 	end
+
+  def lock_wallet(wallet) do
+    case RaiEx.password_enter(wallet, "") do
+      {:ok, _} -> :ok
+      _ -> :error
+    end
+
+  end
 end
