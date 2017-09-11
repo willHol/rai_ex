@@ -773,7 +773,7 @@ defmodule RaiEx do
 
   # Posts the message to the node and decodes the response
   defp post_json_rpc(json) do
-    with {:ok, %Response{status_code: 200, body: body}} <- post(get_url(), json, @headers),
+    with {:ok, %Response{status_code: 200, body: body}} <- post(get_url(), json, @headers, recv_time: :infinity),
          {:ok, map} <- Poison.decode(body)
          do {:ok, map} else {:error, %Error{reason: reason}} -> {:error, reason} end
   end
