@@ -5,6 +5,7 @@ defmodule RaiEx do
   alias HTTPoison.Error
 
   @headers [{"Content-Type", "application/json"}]
+  @options [recv_time: :infinity, timeout: :infinity]
   @default_url "http://localhost:7076"
 
   def connect(url \\ @default_url) do
@@ -767,14 +768,17 @@ defmodule RaiEx do
 
   defp local_host, do: Application.get_env(:rai_ex, :localhost, "127.0.0.1")
 
-  defp get_url do
-    Application.get_env(:rai_ex, :url, @default_url)
-  end
+  defp get_url, do: Application.get_env(:rai_ex, :url, @default_url)
 
   # Posts the message to the node and decodes the response
-  defp post_json_rpc(json) do
-    with {:ok, %Response{status_code: 200, body: body}} <- post(get_url(), json, @headers, recv_time: :infinity),
+  defp post_json_rpc(json, 0, reason), do: {:error, reason}
+  defp post_json_rpc(json, tries \\ 3, prev_reason \\ :error) do
+    with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, @options),
          {:ok, map} <- Poison.decode(body)
-         do {:ok, map} else {:error, %Error{reason: reason}} -> {:error, reason} end
-  end
+         do
+          {:ok, map}
+         else
+          {:error, %Error{reason: reason}} -> post_json_rpc(json, tries - 1, reason)
+         end
+    end
 end
