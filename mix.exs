@@ -33,7 +33,8 @@ defmodule RaiEx.Mixfile do
     [
       {:poison, "~> 3.1"},
       {:httpoison, "~> 0.13.0"},
-      {:ex_doc, "~> 0.16.2", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.16.2", only: :dev, runtime: false},
+      {:decimal, "~> 1.4"}
     ]
   end
 end

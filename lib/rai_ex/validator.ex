@@ -1,7 +1,7 @@
 defmodule Validator do
 	@type_checkers %{
 		:string => {Kernel, :is_binary},
-		:number => {Kernel, :is_number},
+		:number => {Decimal, :decimal?},
 		:integer => {Kernel, :is_integer},
 		:list => {Kernel, :is_list},
 		:wallet => {__MODULE__, :is_hash},
@@ -15,7 +15,7 @@ defmodule Validator do
 	def validate_types(arg_values, types) do
 		invalid_args = Enum.zip(arg_values, types) |> Enum.reduce([] ,fn {arg, type}, list ->
 			{mod, fun} = @type_checkers[type]
-			
+
 			if not apply(mod, fun, [arg]) do
 				[arg | list]
 			else
