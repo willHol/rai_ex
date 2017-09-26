@@ -15,13 +15,13 @@ defmodule RPC do
 	Expands:
 
 	rpc :account_remove do
-    	param "wallet", :string
-    	param "account", :string
-    end
+    param "wallet", :string
+    param "account", :string
+  end
 
-    To single function which takes arguments "wallet" and "account" in the declared order.
-    Additionally this function performs type checking on the arguments, e.g. If the first argument
-    "wallet" does not pass the :string type check, an Argument error will be raised.
+  To single function which takes arguments "wallet" and "account" in the declared order.
+  Additionally this function performs type checking on the arguments, e.g. If the first argument
+  "wallet" does not pass the :string type check, an Argument error will be raised.
 	"""
 	defmacro rpc(action, do: definition) when is_atom(action) do
 		params_list = param_list(definition)
@@ -59,7 +59,7 @@ defmodule RPC do
 	#
 	defp param_list(definition) do
 		{_, list} = Macro.prewalk(definition, [],
-			fn pre, list -> 
+			fn pre, list ->
 				case pre do
 					{:param, _line, [param, _type]} ->
 						{pre, [param | list]}
@@ -86,7 +86,7 @@ defmodule RPC do
 	#
 	defp type_list(definition) do
 		{_, list} = Macro.prewalk(definition, [],
-			fn pre, list -> 
+			fn pre, list ->
 				case pre do
 					{:param, _line, [_param, type]} ->
 						{pre, [type | list]}

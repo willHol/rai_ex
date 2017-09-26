@@ -13,7 +13,7 @@ defmodule Validator do
 	}
 
 	def validate_types(arg_values, types) do
-		invalid_args = Enum.zip(arg_values, types) |> Enum.reduce([] ,fn {arg, type}, list ->
+		invalid_args = Enum.zip(arg_values, types) |> Enum.reduce([] , fn {arg, type}, list ->
 			{mod, fun} = @type_checkers[type]
 
 			if not apply(mod, fun, [arg]) do
