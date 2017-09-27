@@ -7,6 +7,7 @@ defmodule RaiEx do
   @headers [{"Content-Type", "application/json"}]
   @options [recv_time: 5000, timeout: 10000]
   @default_url "http://localhost:7076"
+  @wait_time 75
 
   @doc """
   Used to connect to a different endpoint.
@@ -784,7 +785,9 @@ defmodule RaiEx do
          do
           {:ok, map}
          else
-          {:error, %Error{reason: reason}} -> post_json_rpc(json, tries - 1, reason)
+          {:error, %Error{reason: reason}} ->
+            :timer.sleep(@wait_time)
+            post_json_rpc(json, tries - 1, reason)
          end
     end
 end
