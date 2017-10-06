@@ -454,7 +454,7 @@ defmodule RaiEx do
   end
 
   @doc """
-  # enable_control must be set to true
+  enable_control must be set to true
   """
   rpc :stop do
   end

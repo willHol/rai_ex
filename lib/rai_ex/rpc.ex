@@ -12,17 +12,16 @@ defmodule RPC do
 
 
   @doc """
-  
-  Expands:
+  A macro for generating rpc calling functions with validations.
 
-  rpc :account_remove do
-    param "wallet", :string
-    param "account", :string
-  end
+      rpc :account_remove do
+        param "wallet", :string
+        param "account", :string
+      end
 
-  To single function which takes arguments "wallet" and "account" in the declared order.
-  Additionally this function performs type checking on the arguments, e.g. If the first argument
-  "wallet" does not pass the :string type check, an Argument error will be raised.
+  Transforms to a single function which takes arguments `wallet` and `account` in the *declared order*.
+  Additionally this function performs **type checking** on the arguments, e.g. If the first argument
+  `wallet` does not pass the `:string` type check, an `ArgumentError` will be raised.
   """
   defmacro rpc(action, do: definition) when is_atom(action) do
     params_list = param_list(definition)
