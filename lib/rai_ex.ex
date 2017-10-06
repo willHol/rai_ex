@@ -771,7 +771,7 @@ defmodule RaiEx do
 
   # Posts the message to the node and decodes the response
   @spec post_json_rpc(map, pos_integer, tuple) :: {:ok, map} | {:error, any}
-  defp post_json_rpc(json, tries \\ @retry_count, prev_reason \\ {:error, :unknown})
+  def post_json_rpc(json, tries \\ @retry_count, prev_reason \\ {:error, :unknown})
 
   @doc """
   Posts some json to the RaiBlocks rpc. If the POST is unsuccessful,
