@@ -8,6 +8,7 @@ defmodule RPC do
   defmacro __using__(_opts) do
     quote do
       import RPC
+      alias RaiEx.Validator
 
       @behaviour RPC
     end

@@ -1,4 +1,4 @@
-defmodule Validator do
+defmodule RaiEx.Validator do
   @type_checkers %{
     :string => {Kernel, :is_binary},
     :number => {Decimal, :decimal?},

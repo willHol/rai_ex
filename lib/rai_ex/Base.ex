@@ -58,7 +58,7 @@ defmodule RaiEx.Base do
     try do
       {:ok, decode!(string)}
     rescue
-      e in ArgumentError -> {:error, :badarg}
+      _e in ArgumentError -> {:error, :badarg}
     end
   end
 
@@ -76,11 +76,12 @@ defmodule RaiEx.Base do
       ** (Elixir.ArgumentError)
 
   """
+  def encode!(bitstring, acc \\ "")
   def encode!(<<>>, acc), do: acc
   def encode!(invalid, _acc) when bit_size(invalid) < 5 do
     raise ArgumentError, message: "bit_size must be a multiple of 5"
   end
-  def encode!(bitstring, acc \\ "") do
+  def encode!(bitstring, acc) do
     <<letter::size(5), rest::bitstring>> = bitstring
     encode!(rest, acc <> @mappings[<<letter::size(5)>>])
   end
@@ -101,7 +102,7 @@ defmodule RaiEx.Base do
     try do
       {:ok, encode!(bitstring)}
     rescue
-      e in ArgumentError -> {:error, :badarg}
+      _e in ArgumentError -> {:error, :badarg}
     end
   end
 
