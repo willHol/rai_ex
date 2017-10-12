@@ -4,6 +4,8 @@ defmodule RaiEx.Tools do
 	working with payments.
 	"""
 
+  alias RaiEx.Tools.Base
+
 	@delay 200
 
 	def seed do
@@ -55,9 +57,9 @@ defmodule RaiEx.Tools do
       |> String.split_at(-8)
 
     try do
-      <<_drop::size(4), keep::binary>> = RaiEx.Base.decode!(check)
+      <<_drop::size(4), keep::binary>> = Base.decode!(check)
       hash = Blake2.hash2b(keep, 5)
-      cmp = RaiEx.Base.decode!(sum) |> reverse
+      cmp = Base.decode!(sum) |> reverse
       
       hash == cmp
     rescue
