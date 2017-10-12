@@ -1,4 +1,5 @@
 defmodule RaiExTest do
   use ExUnit.Case
-  doctest RaiEx
+  doctest RaiEx.Tools.Base
+  doctest RaiEx.Tools.Validator
 end

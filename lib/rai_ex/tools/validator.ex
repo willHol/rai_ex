@@ -22,16 +22,10 @@ defmodule RaiEx.Tools.Validator do
 
   ## Examples
 
-      iex> validate_types(
-        ["account" => :string, "count" => :integer],
-        ["account" => "xrb_34bmpi65zr967cdzy4uy4twu7mqs9nrm53r1penffmuex6ruqy8nxp7ms1h1, "count" => 5]
-      )
+      iex> validate_types(["account" => :string, "count" => :integer], ["account" => "xrb_34bmpi65zr967cdzy4uy4twu7mqs9nrm53r1penffmuex6ruqy8nxp7ms1h1, "count" => 5])
       :ok
 
-      iex> validate_types(
-        ["account" => :string, "count" => :integer],
-        ["account" => "xrb_34bmpi65zr967cdzy4uy4twu7mqs9nrm53r1penffmuex6ruqy8nxp7ms1h1, "count" => "10"]
-      )
+      iex> validate_types(["account" => :string, "count" => :integer], ["account" => "xrb_34bmpi65zr967cdzy4uy4twu7mqs9nrm53r1penffmuex6ruqy8nxp7ms1h1, "count" => "10"])
       ** (Elixir.ArgumentError)
 
   """

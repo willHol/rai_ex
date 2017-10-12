@@ -43,7 +43,7 @@ defmodule RaiEx.Tools.Base do
   end
 
   @doc """
-  Same as `RaiEx.Tools.Base.decode!`, except returns a results tuple.
+  Same as `decode!`, except returns a results tuple.
 
   ## Examples
 
@@ -87,7 +87,7 @@ defmodule RaiEx.Tools.Base do
   end
 
   @doc """
-  Same as `RaiEx.Tools.Base.encode!`, except returns a results tuple.
+  Same as `encode!`, except returns a results tuple.
 
   ## Examples
 
@@ -107,7 +107,7 @@ defmodule RaiEx.Tools.Base do
   end
 
   @doc """
-  Returns a duplexed map of character <-> bitstring mappings.
+  Returns a duplexed map of **character <-> bitstring** mappings.
 
   ## Example
 
