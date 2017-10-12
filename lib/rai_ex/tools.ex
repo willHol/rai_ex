@@ -46,6 +46,27 @@ defmodule RaiEx.Tools do
       {:ok, _} -> :ok
       _ -> :error
     end
-
   end
+
+  def address_valid?(address) do
+    {check, sum} = 
+      address
+      |> String.trim("xrb_")
+      |> String.split_at(-8)
+
+    try do
+      <<_drop::size(4), keep::binary>> = RaiEx.Base.decode!(check)
+      hash = Blake2.hash2b(keep, 5)
+      cmp = RaiEx.Base.decode!(sum) |> reverse
+      
+      hash == cmp
+    rescue
+      _ -> false
+    end
+  
+  end
+
+  defp reverse(binary) when is_binary(binary), do: do_reverse(binary, <<>>)
+  defp do_reverse(<<>>, acc), do: acc
+  defp do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)
 end
