@@ -115,4 +115,8 @@ defmodule RaiEx.Tools.Base do
 
   """
   def character_mappings, do: @mappings
+
+  def compute_checksum!(check) do
+    Blake2.hash2b(check, 5)
+  end
 end

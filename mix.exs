@@ -49,7 +49,8 @@ defmodule RaiEx.Mixfile do
       {:httpoison, "~> 0.13.0"},
       {:ex_doc, "~> 0.16.2", only: :dev, runtime: false},
       {:decimal, "~> 1.4"},
-      {:blake2, "~> 1.0"}
+      {:blake2, "~> 1.0"},
+      {:ed25519, "~> 1.0"}
     ]
   end
 end

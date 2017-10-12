@@ -4,7 +4,7 @@ defmodule RaiEx.Tools do
 	working with payments.
 	"""
 
-  alias RaiEx.Tools.Base
+  alias RaiEx.Tools
 
 	@delay 200
 
@@ -96,19 +96,56 @@ defmodule RaiEx.Tools do
       |> String.split_at(-8)
 
     try do
-      <<_drop::size(4), keep::binary>> = Base.decode!(check)
-      hash = Blake2.hash2b(keep, 5)
-      cmp = Base.decode!(sum) |> reverse
-      
-      hash == cmp
+      <<_drop::size(4), keep::binary>> = Tools.Base.decode!(check)
+
+      computed_checksum = Tools.Base.compute_checksum!(keep)
+      attached_checksum =Tools.Base.decode!(sum) |> reverse()
+
+      computed_checksum == attached_checksum
     rescue
       _ -> false
     end
-  
+  end
+
+  @doc """
+  Creates an address from the given *public key*. The address is encoded in
+  base32 as defined in `RaiEx.Tools.Base` and appended with a checksum.
+  """
+  def create_address!(public_key) do
+    encoded_check =
+      public_key
+      |> Base.decode16!()
+      |> Tools.Base.compute_checksum!
+      |> Tools.reverse()
+      |> Tools.Base.encode!()
+
+    encoded_address =
+      public_key
+      |> Base.decode16!()
+      |> pad_binary(4)
+      |> Tools.Base.encode!
+
+    "xrb_#{encoded_address <> encoded_check}"
+  end
+
+  @doc """
+  Generates the public and private keys for a given *wallet
+  """
+  def seed_account(seed, nonce) do
+    Blake2.hash2b(seed <> <<nonce::size(32)>>, 32)
   end
 
   # Reverses a binary
-  defp reverse(binary) when is_binary(binary), do: do_reverse(binary, <<>>)
+  def reverse(binary) when is_binary(binary), do: do_reverse(binary, <<>>)
   defp do_reverse(<<>>, acc), do: acc
   defp do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)
+
+  #
+  def stretch_binary(binary, output_length) do
+    pad_binary(binary, 32 - bit_size(binary))
+  end
+  # Left pads some binary
+  defp pad_binary(binary, bits) do
+    <<0::size(bits), binary::bitstring>>
+  end
 end
