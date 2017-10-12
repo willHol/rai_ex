@@ -1,5 +1,5 @@
 defmodule RPC do
-  @doc """
+  @moduledoc """
   This module provides macros for generating rpc-invoking functions.
   """
   
