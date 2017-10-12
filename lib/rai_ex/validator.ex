@@ -12,25 +12,18 @@ defmodule Validator do
     :address_list => {__MODULE__, :is_address_list}
   }
 
-  def validate_types(arg_values, types) do
-    invalid_args = Enum.zip(arg_values, types) |> Enum.reduce([] , fn {arg, type}, list ->
+
+  def validate_types(should_be, is) do
+    Enum.map(should_be, fn {param, type} ->
       {mod, fun} = @type_checkers[type]
+      arg = is[param]
 
       if not apply(mod, fun, [arg]) do
-        [arg | list]
-      else
-        list
+        raise ArgumentError, message: """
+        #{param} is not of the correct type, should be type: #{type}
+        """
       end
     end)
-
-    if Enum.count(invalid_args) > 0 do
-      raise ArgumentError,
-      message: """
-
-      Invalid arguments: #{inspect invalid_args}
-      Types should be: #{inspect types}
-      """
-    end
   end
 
   def is_hash(wallet) do
@@ -44,7 +37,7 @@ defmodule Validator do
   def is_address_list(addr_list) do
     if is_list(addr_list), do: addr_list |> Enum.all?(&(is_address(&1))), else: false
   end
-
+ 
   def is_hash_list(hash_list) do
     if is_list(hash_list), do: hash_list |> Enum.all?(&(is_hash(&1))), else: false
   end

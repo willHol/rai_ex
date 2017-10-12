@@ -3,13 +3,23 @@ defmodule RPC do
   #
   # For now it returns a quoted expression that
   # imports the module itself into the user code.
+  
   @doc false
   defmacro __using__(_opts) do
     quote do
       import RPC
+
+      @behaviour RPC
     end
   end
 
+  defmacro param(name, type) do
+    quote do
+      Module.put_attribute(__MODULE__, @current_action, {unquote(name), unquote(type)})
+    end
+  end
+
+  @callback post_json_rpc(map, pos_integer, tuple) :: {:ok, map} | {:error, any}
 
   @doc """
   A macro for generating rpc calling functions with validations.
@@ -24,82 +34,62 @@ defmodule RPC do
   `wallet` does not pass the `:string` type check, an `ArgumentError` will be raised.
   """
   defmacro rpc(action, do: definition) when is_atom(action) do
-    params_list = param_list(definition)
-    params_list_quoted = params_list |> Macro.escape
-
-    types_list_quoted = type_list(definition) |> Macro.escape
-
-    args = create_args(__MODULE__, Enum.count(params_list))
-
     quote do
-      def unquote(action)(unquote_splicing(args)) do
-        Validator.validate_types(unquote(args), unquote(types_list_quoted))
+      Module.put_attribute(__MODULE__, :current_action, unquote(action))
+      Module.register_attribute(__MODULE__, unquote(action), accumulate: true)
 
-        Enum.zip(unquote(params_list_quoted), unquote(args))
+      unquote(definition)
+
+      param_to_type_keywords = Module.get_attribute(__MODULE__, unquote(action)) |> Enum.reverse()
+
+      Module.eval_quoted __ENV__, [
+        RPC.__build_keyword_func__(@current_action, param_to_type_keywords),
+        RPC.__build_seq_func__(@current_action, param_to_type_keywords)
+      ]
+    end
+  end
+
+  @doc false
+  def __named_args_from_keyword__(context, keyword_list) do
+    Enum.map(keyword_list, fn {arg_name, _type} ->
+      {:"#{arg_name}", Macro.var(:"#{arg_name}", context)}
+    end)
+  end
+
+  @doc false
+  def __seq_args_from_keyword__(context, keyword_list) do
+    Enum.map(keyword_list, fn {arg_name, _type} ->
+      Macro.var(:"#{arg_name}", context)
+    end)
+  end
+
+  @doc false
+  def __build_keyword_func__(action, list) do
+    quote do
+      def unquote(action) (unquote(RPC.__named_args_from_keyword__(__MODULE__, list))) do
+        Validator.validate_types(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
+
+        unquote(RPC.__named_args_from_keyword__(__MODULE__, list))
         |> Enum.into(%{})
-        |> Map.put("action", unquote(action))
+        |> Map.put(:action, unquote(action))
         |> Poison.encode!
         |> post_json_rpc
       end
     end
   end
 
-  # Gathers a list of params, in the defined order.
-  #
-  # Example:
-  #
-  # rpc :account_remove do
-  #   param "wallet", :string
-  #   param "account", :string
-  # end
-  #
-  # Yields:
-  #
-  # ["wallet", "account"]
-  #
-  defp param_list(definition) do
-    {_, list} = Macro.prewalk(definition, [],
-      fn pre, list ->
-        case pre do
-          {:param, _line, [param, _type]} ->
-            {pre, [param | list]}
-          _ ->
-            {pre, list}
-        end
-      end)
+  @doc false
+  def __build_seq_func__(action, list) do
+    quote do
+      def unquote(action) (unquote_splicing(RPC.__seq_args_from_keyword__(__MODULE__, list))) do
+        Validator.validate_types(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
 
-    list |> Enum.reverse
+        unquote(RPC.__named_args_from_keyword__(__MODULE__, list))
+        |> Enum.into(%{})
+        |> Map.put(:action, unquote(action))
+        |> Poison.encode!
+        |> post_json_rpc
+      end
+    end
   end
-
-  # Gathers a list of types, in the defined order.
-  #
-  # Example:
-  #
-  # rpc :account_remove do
-  #   param "wallet", :string
-  #   param "account", :string
-  # end
-  #
-  # Yields:
-  #
-  # [:string, :string]
-  #
-  defp type_list(definition) do
-    {_, list} = Macro.prewalk(definition, [],
-      fn pre, list ->
-        case pre do
-          {:param, _line, [_param, type]} ->
-            {pre, [type | list]}
-          _ ->
-            {pre, list}
-        end
-      end)
-
-    list |> Enum.reverse
-  end
-
-  # Creates a dynamic arguments list, where each argument
-  # is a variable instead of a constant.
-  defp create_args(_, 0), do: []
-  defp create_args(fn_mdl, arg_cnt), do: Enum.map(1..arg_cnt, &(Macro.var (:"arg#{&1}"), fn_mdl))
 end

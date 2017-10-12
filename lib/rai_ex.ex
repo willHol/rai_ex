@@ -770,7 +770,6 @@ defmodule RaiEx do
   defp get_url, do: Application.get_env(:rai_ex, :url, @default_url)
 
   # Posts the message to the node and decodes the response
-  @spec post_json_rpc(map, pos_integer, tuple) :: {:ok, map} | {:error, any}
   def post_json_rpc(json, tries \\ @retry_count, prev_reason \\ {:error, :unknown})
 
   @doc """
@@ -787,8 +786,8 @@ defmodule RaiEx do
       {:error, reason}
 
   """
-  def post_json_rpc(json, 0, reason), do: {:error, reason}
-  def post_json_rpc(json, tries, prev_reason) do
+  def post_json_rpc(_json, 0, reason), do: {:error, reason}
+  def post_json_rpc(json, tries, _prev_reason) do
     with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, @options),
          {:ok, map} <- Poison.decode(body)
          do
