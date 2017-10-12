@@ -33,6 +33,7 @@ defmodule RPC do
   Transforms to a single function which takes arguments `wallet` and `account` in the *declared order*.
   Additionally this function performs **type checking** on the arguments, e.g. If the first argument
   `wallet` does not pass the `:string` type check, an `ArgumentError` will be raised.
+  
   """
   defmacro rpc(action, do: definition) when is_atom(action) do
     quote do

@@ -8,17 +8,35 @@ defmodule RaiEx.Tools do
 
 	@delay 200
 
+  @doc """
+  Generates a wallet seed.
+  """
 	def seed do
 		<< int :: size(64) >> = :crypto.strong_rand_bytes(8)
 		int
 	end
 
+  @doc """
+  Changes the password for the `wallet`.
+
+  ## Examples
+
+      iex> change_password(wallet, current_pwd, new_pwd)
+      {:ok, wallet}
+
+      iex> change_password(wallet, invalid_pwd, new_pwd)
+      {:error, reason}
+
+  """
 	def change_password(wallet, current_pwd, password) do
 		with {:ok, %{"valid" => "1"}} <- RaiEx.password_enter(wallet, current_pwd),
 			 	 {:ok, %{"changed" => "1"}} <- RaiEx.password_change(wallet, password)
 			 	 do {:ok, wallet} else {_, reason} -> {:error, reason} end
 	end
 
+  @doc """
+  Creates a new encrypted wallet. Locks it with `password`.
+  """
 	def wallet_create_encrypted(password) do
 		with {:ok, %{"wallet" => wallet}} <- RaiEx.wallet_create,
 				 _ <- :timer.sleep(@delay),

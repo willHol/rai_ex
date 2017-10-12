@@ -769,13 +769,10 @@ defmodule RaiEx do
 
   defp get_url, do: Application.get_env(:rai_ex, :url, @default_url)
 
-  # Posts the message to the node and decodes the response
-  def post_json_rpc(json, tries \\ @retry_count, prev_reason \\ {:error, :unknown})
-
   @doc """
   Posts some json to the RaiBlocks rpc. If the POST is unsuccessful,
   it is re-sent `@retry_count` many times with a delay of `@wait_time`
-  between retries.
+  between retries. Callback implementation for `RaiEx.RPC`.
 
   ## Examples
 
@@ -786,6 +783,7 @@ defmodule RaiEx do
       {:error, reason}
 
   """
+  def post_json_rpc(json, tries \\ @retry_count, prev_reason \\ {:error, :unknown})
   def post_json_rpc(_json, 0, reason), do: {:error, reason}
   def post_json_rpc(json, tries, _prev_reason) do
     with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, @options),
