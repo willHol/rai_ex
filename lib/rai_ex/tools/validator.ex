@@ -1,6 +1,6 @@
 defmodule RaiEx.Tools.Validator do
   @moduledoc """
-  Provides functionality for run-time validation of `RaiEx.RPC` types.
+  Provides functionality for run-time validation of rpc types.
   """
 
   @type_checkers %{
@@ -17,7 +17,7 @@ defmodule RaiEx.Tools.Validator do
   }
 
   @doc """
-  Validates the type types used by `RaiEx.RPC`. Raises `Elixir.ArgumentError`
+  Validates the type types used by `RaiEx.RPC`. Raises `.ArgumentError`
   if the types fail to validate.
 
   ## Examples

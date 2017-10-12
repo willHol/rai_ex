@@ -13,6 +13,9 @@ defmodule RPC do
     end
   end
 
+  @doc """
+  A macro for defining parameters and their types inside an rpc block.
+  """
   defmacro param(name, type) do
     quote do
       Module.put_attribute(__MODULE__, @current_action, {unquote(name), unquote(type)})

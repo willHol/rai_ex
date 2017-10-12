@@ -25,7 +25,7 @@ defmodule RaiEx.Tools.Base do
   @doc """
   Decodes a base32 string into its bitstring form.
 
-  Raises `Elixir.ArgumentError` if the string is invalid.
+  Raises `ArgumentError` if the string is invalid.
 
   ## Examples
 
@@ -43,7 +43,7 @@ defmodule RaiEx.Tools.Base do
   end
 
   @doc """
-  Same as `RaiEx.Base.decode!`, except returns a results tuple.
+  Same as `RaiEx.Tools.Base.decode!`, except returns a results tuple.
 
   ## Examples
 
@@ -65,7 +65,7 @@ defmodule RaiEx.Tools.Base do
   @doc """
   Encodes a bitstring/binary into its base32 form.
 
-  Raises `Elixir.ArgumentError` if the bitstring/binary is invalid.
+  Raises `ArgumentError` if the bitstring/binary is invalid.
 
   ## Examples
 
@@ -87,7 +87,7 @@ defmodule RaiEx.Tools.Base do
   end
 
   @doc """
-  Same as `RaiEx.Base.encode!`, except returns a results tuple.
+  Same as `RaiEx.Tools.Base.encode!`, except returns a results tuple.
 
   ## Examples
 
@@ -107,7 +107,7 @@ defmodule RaiEx.Tools.Base do
   end
 
   @doc """
-  Returns the duplexed map.
+  Returns a duplexed map of character <-> bitstring mappings.
 
   ## Example
 
