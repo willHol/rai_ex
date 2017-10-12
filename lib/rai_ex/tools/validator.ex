@@ -1,4 +1,8 @@
 defmodule RaiEx.Tools.Validator do
+  @moduledoc """
+  Provides functionality for run-time validation of `RaiEx.RPC` types.
+  """
+
   @type_checkers %{
     :string => {Kernel, :is_binary},
     :number => {Decimal, :decimal?},

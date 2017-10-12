@@ -1,6 +1,6 @@
 defmodule RaiEx.Tools.Base do
   @moduledoc """
-  Provides functions for dealing with encoding and decoding, RaiDice base32.
+  This module provides functions for dealing with encoding and decoding, RaiDice base32.
   """
 
   @mappings (

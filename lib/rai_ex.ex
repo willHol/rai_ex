@@ -1,4 +1,8 @@
 defmodule RaiEx do
+  @moduledoc """
+  This module contains the definitions of all the RaiBlocks node RPC calls.
+  """
+
   import HTTPoison
   use RPC
 

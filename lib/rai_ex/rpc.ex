@@ -1,8 +1,7 @@
 defmodule RPC do
-  # Callback invoked by `use`.
-  #
-  # For now it returns a quoted expression that
-  # imports the module itself into the user code.
+  @doc """
+  This module provides macros for generating rpc-invoking functions.
+  """
   
   @doc false
   defmacro __using__(_opts) do

@@ -9,6 +9,8 @@ defmodule RaiEx.Mixfile do
       start_permanent: Mix.env == :prod,
       deps: deps(),
       docs: docs(),
+      package: package(),
+      description: description(),
       source_url: "https://github.com/willHol/rai_ex",
       name: "RaiEx"
     ]
@@ -24,6 +26,19 @@ defmodule RaiEx.Mixfile do
   def docs do
     [
       extras: ["README.md"]
+    ]
+  end
+
+  defp description() do
+    "An Elixir client for managing a RaiBlocks node."
+  end
+
+  def package do
+    [
+      licenses: ["Apache 2.0"],
+      maintainers: ["William Holmes"],
+      links: %{"GitHub" => "https://github.com/willHol/rai_ex"},
+      source_url: "https://github.com/willHol/rai_ex"
     ]
   end
 
