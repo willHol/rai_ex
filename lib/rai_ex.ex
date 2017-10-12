@@ -1,13 +1,19 @@
 defmodule RaiEx do
   import HTTPoison
   use RPC
+
   alias HTTPoison.Response
   alias HTTPoison.Error
 
   @headers [{"Content-Type", "application/json"}]
-  @options [recv_time: :infinity, timeout: :infinity]
+  @options [recv_time: 5000, timeout: 10000]
   @default_url "http://localhost:7076"
+  @wait_time 75
+  @retry_count 3
 
+  @doc """
+  Used to connect to a different endpoint.
+  """
   def connect(url \\ @default_url) do
     Application.put_env(:rai_ex, :url, parse_url(url))
   end
@@ -362,8 +368,8 @@ defmodule RaiEx do
 
   @doc """
   Receive pending block for account in wallet
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :receive do
     param "wallet", :wallet
@@ -373,8 +379,8 @@ defmodule RaiEx do
 
   @doc """
   Returns receive minimum for node.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :receive_minimum do
   end
@@ -401,8 +407,8 @@ defmodule RaiEx do
 
   @doc """
   Sets the default representative for wallet.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_representative_set do
     param "wallet", :wallet
@@ -448,7 +454,7 @@ defmodule RaiEx do
   end
 
   @doc """
-  # enable_control must be set to true
+  enable_control must be set to true
   """
   rpc :stop do
   end
@@ -513,8 +519,8 @@ defmodule RaiEx do
 
   @doc """
   Clear unchecked synchronizing blocks.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :unchecked_clear do
   end
@@ -536,8 +542,8 @@ defmodule RaiEx do
 
   @doc """
   Add an adhoc private key key to wallet.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_add do
     param "wallet", :wallet
@@ -560,8 +566,8 @@ defmodule RaiEx do
 
   @doc """
   Changes seed for wallet to seed.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_change_seed do
     param "wallet", :wallet
@@ -578,16 +584,16 @@ defmodule RaiEx do
 
   @doc """
   Creates a new random wallet id.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_create do
   end
 
   @doc """
   Destroys wallet and all contained accounts.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_destroy do
     param "wallet", :wallet
@@ -610,8 +616,8 @@ defmodule RaiEx do
 
   @doc """
   Returns a list of block hashes which have not yet been received by accounts in this wallet.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_pending do
     param "wallet", :wallet
@@ -620,8 +626,8 @@ defmodule RaiEx do
 
   @doc """
   Returns a list of pending block hashes with amount more or equal to threshold.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_pending do
     param "wallet", :wallet
@@ -631,8 +637,8 @@ defmodule RaiEx do
 
   @doc """
   Rebroadcast blocks for accounts from wallet starting at frontier down to count to the network.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_republish do
     param "wallet", :wallet
@@ -641,8 +647,8 @@ defmodule RaiEx do
 
   @doc """
   Returns a list of pairs of account and work from wallet.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :wallet_work_get do
     param "wallet", :wallet
@@ -650,8 +656,8 @@ defmodule RaiEx do
 
   @doc """
   Changes the password for wallet to password.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :password_change do
     param "wallet", :wallet
@@ -675,8 +681,8 @@ defmodule RaiEx do
 
   @doc """
   Stop generating work for block.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :work_cancel do
     param "hash", :hash
@@ -684,8 +690,8 @@ defmodule RaiEx do
 
   @doc """
   Generates work for block
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :work_generate do
     param "hash", :hash
@@ -693,8 +699,8 @@ defmodule RaiEx do
 
   @doc """
   Retrieves work for account in wallet.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :work_get do
     param "wallet", :wallet
@@ -703,8 +709,8 @@ defmodule RaiEx do
 
   @doc """
   Set work for account in wallet.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :work_set do
     param "wallet", :wallet
@@ -714,8 +720,8 @@ defmodule RaiEx do
 
   @doc """
   Add specific IP address and port as work peer for node until restart.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :work_peer_add do
     param "address", :string
@@ -724,16 +730,16 @@ defmodule RaiEx do
 
   @doc """
   Retrieves work peers.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :work_peers do
   end
 
   @doc """
   Clear work peers node list until restart.
-
-  ## enable_control must be set to true
+  
+  enable_control must be set to true
   """
   rpc :work_peers_clear do
   end
@@ -746,14 +752,7 @@ defmodule RaiEx do
     param "hash", :hash
   end
 
-  # @doc """
-  # Send JSON POST requests with every new block to
-  # callback server http://callback_address:callback_port<callback_target>
-  # defined in config.json.
-  # """
-  # # NOT SURE
-
-
+  # Parses a URL into its fully qualified form
   defp parse_url(url) do
     case String.splitter(url, ["://", ":"]) |> Enum.take(3) do
       ["http", "localhost", port] -> "http://#{local_host()}:#{port}"
@@ -771,14 +770,33 @@ defmodule RaiEx do
   defp get_url, do: Application.get_env(:rai_ex, :url, @default_url)
 
   # Posts the message to the node and decodes the response
-  defp post_json_rpc(json, 0, reason), do: {:error, reason}
-  defp post_json_rpc(json, tries \\ 3, prev_reason \\ :error) do
+  @spec post_json_rpc(map, pos_integer, tuple) :: {:ok, map} | {:error, any}
+  def post_json_rpc(json, tries \\ @retry_count, prev_reason \\ {:error, :unknown})
+
+  @doc """
+  Posts some json to the RaiBlocks rpc. If the POST is unsuccessful,
+  it is re-sent `@retry_count` many times with a delay of `@wait_time`
+  between retries.
+
+  ## Examples
+
+      iex> post_json_rpc(%{"action" => "wallet_create"})
+      {:ok, %{"wallet" => "0000000000000000"}}
+
+      iex> post_json_rpc(%{"action" => "timeout"})
+      {:error, reason}
+
+  """
+  def post_json_rpc(json, 0, reason), do: {:error, reason}
+  def post_json_rpc(json, tries, prev_reason) do
     with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, @options),
          {:ok, map} <- Poison.decode(body)
          do
           {:ok, map}
          else
-          {:error, %Error{reason: reason}} -> post_json_rpc(json, tries - 1, reason)
+          {:error, %Error{reason: reason}} ->
+            :timer.sleep(@wait_time)
+            post_json_rpc(json, tries - 1, reason)
          end
     end
 end
