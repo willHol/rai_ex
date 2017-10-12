@@ -44,12 +44,18 @@ defmodule RaiEx.Tools do
 			   do {:ok, wallet} else {_, reason} -> {:error, reason} end
 	end
 
+  @doc """
+  Creates a new adhod wallet.
+  """
 	def wallet_add_adhoc(wallet) do
 		with {:ok, %{"private" => priv, "public" => pub, "account" => acc}} <- RaiEx.key_create,
 			   {:ok, %{"account" => ^acc}} <- RaiEx.wallet_add(wallet, priv)
 			   do {:ok, %{"private" => priv, "public" => pub, "account" => acc}} else {_, reason} -> {:error, reason} end
 	end
 
+  @doc """
+  Unlocks the given wallet with its `password`.
+  """
   def unlock_wallet(wallet, password) do
     case RaiEx.password_enter(wallet, password) do
       {:ok, %{"valid" => "1"}} ->
@@ -61,6 +67,9 @@ defmodule RaiEx.Tools do
     end
   end
 
+  @doc """
+  Locks the given wallet.
+  """
   def lock_wallet(wallet) do
     case RaiEx.password_enter(wallet, "") do
       {:ok, _} -> :ok
@@ -68,6 +77,18 @@ defmodule RaiEx.Tools do
     end
   end
 
+  @doc """
+  Calculates and compares the checksum on an address, returns a boolean.
+
+  ## Examples
+
+      iex> address_valid("xrb_34bmpi65zr967cdzy4uy4twu7mqs9nrm53r1penffmuex6ruqy8nxp7ms1h1")
+      true
+
+      iex> address_valid("clearly not valid")
+      false
+
+  """
   def address_valid?(address) do
     {check, sum} = 
       address
@@ -86,6 +107,7 @@ defmodule RaiEx.Tools do
   
   end
 
+  # Reverses a binary
   defp reverse(binary) when is_binary(binary), do: do_reverse(binary, <<>>)
   defp do_reverse(<<>>, acc), do: acc
   defp do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)

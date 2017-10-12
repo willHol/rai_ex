@@ -8,7 +8,7 @@ defmodule RaiEx.Tools.Base do
       "13456789abcdefghijkmnopqrstuwxyz"
       |> String.split("", trim: true)
       |> Enum.reduce({0, %{}}, fn letter, {i, map} -> 
-           {
+          {
             i + 1,
             Map.merge(map, %{letter => <<i :: size(5)>>, <<i :: size(5)>> => letter})
           }
