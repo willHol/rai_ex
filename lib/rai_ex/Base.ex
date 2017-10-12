@@ -1,5 +1,5 @@
 defmodule RaiEx.Base do
-  def generate_mappings do
+  @mappings (
     {_i, mappings} =
       "13456789abcdefghijkmnopqrstuwxyz"
       |> String.split("")
@@ -9,15 +9,13 @@ defmodule RaiEx.Base do
          end)
 
     mappings
-  end
+  )
 
   def decode!(string) do
-    m = generate_mappings()
-
     string
     |> String.split("")
     |> Enum.drop(-1)
-    |> Enum.reduce(<<>>, &(<<&2::bitstring, m[&1]::bitstring>>))
+    |> Enum.reduce(<<>>, &(<<&2::bitstring, @mappings[&1]::bitstring>>))
   end
 
   def decode(string) do
@@ -28,4 +26,6 @@ defmodule RaiEx.Base do
       e in ArgumentError -> {:error, :badarg}
     end
   end
+
+  def character_mappings, do: @mappings
 end
