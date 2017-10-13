@@ -5,6 +5,7 @@ defmodule RaiEx.Tools do
   """
 
   alias RaiEx.Tools
+  alias RaiEx.Block
 
   @delay 200
 
@@ -202,7 +203,7 @@ defmodule RaiEx.Tools do
 
 
 
-  def send_block(%{
+  def send_block(%Block{
     type: type,
     previous: previous,
     destination: destination,
@@ -213,7 +214,7 @@ defmodule RaiEx.Tools do
       
   end
 
-  def sign_block(%{
+  def sign_block(%Block{
     type: type,
     previous: previous,
     destination: destination,
