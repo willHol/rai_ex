@@ -15,9 +15,12 @@ defmodule RPC do
   @doc """
   A macro for defining parameters and their types inside an rpc block.
   """
-  defmacro param(name, type) do
+  defmacro param(name, type, opts \\ []) do
     quote do
-      Module.put_attribute(__MODULE__, @current_action, {unquote(name), unquote(type)})
+      Module.put_attribute(__MODULE__, @current_action,
+                            {unquote(name), unquote(type)})
+
+      Module.put_attribute(__MODULE__, :"#{@current_action}_opts", unquote(opts))
     end
   end
 
@@ -45,9 +48,11 @@ defmodule RPC do
 
       param_to_type_keywords = Module.get_attribute(__MODULE__, unquote(action)) |> Enum.reverse()
 
+      opts = Module.get_attribute(__MODULE__, :"#{@current_action}_opts") || []
+
       Module.eval_quoted __ENV__, [
-        RPC.__build_keyword_func__(@current_action, param_to_type_keywords),
-        RPC.__build_seq_func__(@current_action, param_to_type_keywords)
+        RPC.__build_keyword_func__(@current_action, param_to_type_keywords, opts),
+        RPC.__build_seq_func__(@current_action, param_to_type_keywords, opts)
       ]
     end
   end
@@ -67,7 +72,7 @@ defmodule RPC do
   end
 
   @doc false
-  def __build_keyword_func__(action, list) do
+  def __build_keyword_func__(action, list, opts) do
     quote do
       def unquote(action) (unquote(RPC.__named_args_from_keyword__(__MODULE__, list))) do
         RaiEx.Tools.Validator.validate_types(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
@@ -76,13 +81,13 @@ defmodule RPC do
         |> Enum.into(%{})
         |> Map.put(:action, unquote(action))
         |> Poison.encode!
-        |> post_json_rpc
+        |> post_json_rpc(unquote(opts))
       end
     end
   end
 
   @doc false
-  def __build_seq_func__(action, list) do
+  def __build_seq_func__(action, list, opts) do
     quote do
       def unquote(action) (unquote_splicing(RPC.__seq_args_from_keyword__(__MODULE__, list))) do
         RaiEx.Tools.Validator.validate_types(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
@@ -91,7 +96,7 @@ defmodule RPC do
         |> Enum.into(%{})
         |> Map.put(:action, unquote(action))
         |> Poison.encode!
-        |> post_json_rpc
+        |> post_json_rpc(unquote(opts))
       end
     end
   end

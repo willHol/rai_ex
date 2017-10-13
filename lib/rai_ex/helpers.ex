@@ -1,5 +1,4 @@
 defmodule RaiEx.Helpers do
-
   @doc """
   Converts hex string(s) to binary if necessary.
   """

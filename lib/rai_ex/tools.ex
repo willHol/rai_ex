@@ -7,7 +7,6 @@ defmodule RaiEx.Tools do
   import RaiEx.Helpers
 
   alias RaiEx.Tools
-  alias RaiEx.Block
 
   @delay 200
 
@@ -154,7 +153,7 @@ defmodule RaiEx.Tools do
     encoded_check =
       pub_key
       |> Tools.Base.compute_checksum!
-      |> Tools.reverse()
+      |> reverse()
       |> Tools.Base.encode!()
 
     encoded_address =

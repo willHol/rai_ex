@@ -787,17 +787,19 @@ defmodule RaiEx do
       {:error, reason}
 
   """
-  def post_json_rpc(json, tries \\ @retry_count, prev_reason \\ {:error, :unknown})
-  def post_json_rpc(_json, 0, reason), do: {:error, reason}
-  def post_json_rpc(json, tries, _prev_reason) do
-    with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, @options),
+  def post_json_rpc(json, opts \\ [], tries \\ @retry_count, prev_reason \\ {:error, :unknown})
+  def post_json_rpc(_json, _opts, 0, reason), do: {:error, reason}
+  def post_json_rpc(json, opts, tries, _prev_reason) do
+    comb_opts = Keyword.merge(@options, opts)
+
+    with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, comb_opts),
          {:ok, map} <- Poison.decode(body)
          do
           {:ok, map}
          else
           {:error, %Error{reason: reason}} ->
             :timer.sleep(@wait_time)
-            post_json_rpc(json, tries - 1, reason)
+            post_json_rpc(json, opts, tries - 1, reason)
          end
     end
 end
