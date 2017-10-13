@@ -30,11 +30,12 @@ defmodule RaiEx.Tools.Validator do
 
   """
   def validate_types(should_be, is) do
+    should_be = Enum.into(should_be, %{})
     Enum.map(should_be, fn {param, type} ->
       {mod, fun} = @type_checkers[type]
-      arg = is[param]
+      arg = is[String.to_atom(param)]
 
-      if not apply(mod, fun, [arg]) do
+      unless apply(mod, fun, [arg]) do
         raise ArgumentError, message: """
         #{param} is not of the correct type, should be type: #{type}
         """
