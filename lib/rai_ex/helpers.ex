@@ -1,5 +1,5 @@
 defmodule RaiEx.Helpers do
-  @doc """
+  @moduledoc """
   Converts hex string(s) to binary if necessary.
   """
   def if_string_hex_to_binary([]), do: []

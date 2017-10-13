@@ -1,5 +1,5 @@
 defmodule RaiEx.Block do
-  @doc """
+  @moduledoc """
   The block struct and associated functions.
   """
 
