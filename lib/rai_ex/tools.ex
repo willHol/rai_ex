@@ -110,31 +110,70 @@ defmodule RaiEx.Tools do
   @doc """
   Creates an address from the given *public key*. The address is encoded in
   base32 as defined in `RaiEx.Tools.Base` and appended with a checksum.
+
+  ## Examples
+
+      iex> create_address!(<<125, 169, 163, 231, 136, 75, 168, 59, 83, 105, 128, 71, 82, 149, 53, 87, 90, 35, 149, 51, 106, 243, 76, 13, 250, 28, 59, 128, 5, 181, 81, 116>>)
+      "xrb_1zfbnhmrikxa9fbpm149cccmcott6gcm8tqmbi8zn93ui14ucndn93mtijeg"
+
+      iex> create_address!("7DA9A3E7884BA83B53698047529535575A2395336AF34C0DFA1C3B8005B55174")
+      "xrb_1zfbnhmrikxa9fbpm149cccmcott6gcm8tqmbi8zn93ui14ucndn93mtijeg"
+
   """
-  def create_address!(public_key) do
+  def create_address!(pub_key) do
+    # This allows both a binary input or hex string
+    pub_key = if String.valid?(pub_key), do: Base.decode16!(pub_key), else: pub_key
+
     encoded_check =
-      public_key
+      pub_key
       |> Tools.Base.compute_checksum!
       |> Tools.reverse()
       |> Tools.Base.encode!()
 
     encoded_address =
-      public_key
+      pub_key
       |> pad_binary(4)
       |> Tools.Base.encode!
 
     "xrb_#{encoded_address <> encoded_check}"
   end
 
-  def derive_public(private_key) do
-    Ed25519.derive_public_key(private_key)
+  @doc """
+  Derives the public key from the private key.
+
+  ## Examples
+
+      iex> derive_public(<<84, 151, 51, 84, 136, 206, 7, 211, 66, 222, 10, 240, 159, 113, 36, 98, 93, 238, 29, 96, 95, 8, 33, 62, 53, 162, 139, 52, 75, 123, 38, 144>>)
+      <<125, 169, 163, 231, 136, 75, 168, 59, 83, 105, 128, 71, 82, 149, 53, 87, 90, 35, 149, 51, 106, 243, 76, 13, 250, 28, 59, 128, 5, 181, 81, 116>>
+  
+      iex> derive_public("5497335488CE07D342DE0AF09F7124625DEE1D605F08213E35A28B344B7B2690")
+      <<125, 169, 163, 231, 136, 75, 168, 59, 83, 105, 128, 71, 82, 149, 53, 87, 90, 35, 149, 51, 106, 243, 76, 13, 250, 28, 59, 128, 5, 181, 81, 116>>
+
+  """
+  def derive_public(priv_key) do
+    # This allows both a binary input or hex string
+    priv_key = if String.valid?(priv_key), do: Base.decode16!(priv_key), else: priv_key
+    
+    Ed25519.derive_public_key(priv_key)
   end
 
   @doc """
-  Generates the public and private keys for a given *wallet
+  Generates the public and private keys for a given *wallet*.
+
+  ## Examples
+
+      iex> seed_account("8208BD79655E7141DCFE792084AB6A8FDFFFB56F37CE30ADC4C2CC940E276A8B", 0)
+      {pub, priv}
+
   """
   def seed_account(seed, nonce) do
-    Blake2.hash2b(seed <> <<nonce::size(32)>> , 32)
+    # This allows both a binary input or hex string
+    seed = if String.valid?(seed), do: Base.decode16!(seed), else: seed
+
+    priv = Blake2.hash2b(seed <> <<nonce::size(32)>>, 32)
+    pub  = derive_public(priv)
+
+    {pub, priv} 
   end
 
   # Reverses a binary
@@ -142,10 +181,6 @@ defmodule RaiEx.Tools do
   defp do_reverse(<<>>, acc), do: acc
   defp do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)
 
-  #
-  def stretch_binary(binary, output_length) do
-    pad_binary(binary, 32 - bit_size(binary))
-  end
   # Left pads some binary
   defp pad_binary(binary, bits) do
     <<0::size(bits), binary::bitstring>>
