@@ -367,7 +367,7 @@ defmodule RaiEx do
   Publish `block` to the network.
   """
   rpc :process do
-    param "block", :block
+    param "block", :any
   end
 
   @doc """

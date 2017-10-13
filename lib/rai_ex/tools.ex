@@ -119,7 +119,7 @@ defmodule RaiEx.Tools do
   end
 
   @doc """
-  Same as `address_to_public` except leaves untrimmied 5 bytes on end of binary.
+  Same as `address_to_public` except leaves untrimmied 5 bytes at end of binary.
   """
   def address_to_public_without_trim(address) do
     binary =
@@ -199,35 +199,6 @@ defmodule RaiEx.Tools do
     pub  = derive_public(priv)
 
     {priv, pub} 
-  end
-
-
-
-  def send_block(%Block{
-    type: type,
-    previous: previous,
-    destination: destination,
-    balance: balance,
-    work: work,
-    signature: signature
-  }) do
-      
-  end
-
-  def sign_block(%Block{
-    type: type,
-    previous: previous,
-    destination: destination,
-    balance: balance,
-    work: work,
-    signature: signature
-  }, priv_key, pub_key \\ nil) do
-    # Converts binaries if necessary
-    [priv_key, pub_key, previous, destination, balance] =
-      if_string_hex_to_binary([priv_key, pub_key, previous, destination, balance])
-
-    hash = Blake2.hash2b(previous <> destination <> balance, 32)
-    Ed25519.signature(hash, priv_key, pub_key)
   end
 
   # Converts a hex string to binary if necessary

@@ -13,8 +13,11 @@ defmodule RaiEx.Tools.Validator do
     :hash_list => {__MODULE__, :is_hash_list},
     :block => {__MODULE__, :is_hash},
     :address => {__MODULE__, :is_address},
-    :address_list => {__MODULE__, :is_address_list}
+    :address_list => {__MODULE__, :is_address_list},
+    :any => {__MODULE__, :any}
   }
+
+  def any(_), do: true
 
   @doc """
   Validates the type types used by `RaiEx.RPC`. Raises `.ArgumentError`
