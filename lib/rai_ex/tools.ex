@@ -114,25 +114,27 @@ defmodule RaiEx.Tools do
   def create_address!(public_key) do
     encoded_check =
       public_key
-      |> Base.decode16!()
       |> Tools.Base.compute_checksum!
       |> Tools.reverse()
       |> Tools.Base.encode!()
 
     encoded_address =
       public_key
-      |> Base.decode16!()
       |> pad_binary(4)
       |> Tools.Base.encode!
 
     "xrb_#{encoded_address <> encoded_check}"
   end
 
+  def derive_public(private_key) do
+    Ed25519.derive_public_key(private_key)
+  end
+
   @doc """
   Generates the public and private keys for a given *wallet
   """
   def seed_account(seed, nonce) do
-    Blake2.hash2b(seed <> <<nonce::size(32)>>, 32)
+    Blake2.hash2b(seed <> <<nonce::size(32)>> , 32)
   end
 
   # Reverses a binary

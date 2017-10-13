@@ -50,7 +50,8 @@ defmodule RaiEx.Mixfile do
       {:ex_doc, "~> 0.16.2", only: :dev, runtime: false},
       {:decimal, "~> 1.4"},
       {:blake2, "~> 1.0"},
-      {:ed25519, "~> 1.0"}
+      {:ed25519, "~> 1.0"},
+      {:libdecaf, "~> 0.0.4"}
     ]
   end
 end
