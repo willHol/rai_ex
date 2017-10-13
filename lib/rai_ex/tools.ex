@@ -4,6 +4,8 @@ defmodule RaiEx.Tools do
   working with payments.
   """
 
+  import RaiEx.Helpers
+
   alias RaiEx.Tools
   alias RaiEx.Block
 
@@ -199,25 +201,5 @@ defmodule RaiEx.Tools do
     pub  = derive_public(priv)
 
     {priv, pub} 
-  end
-
-  # Converts a hex string to binary if necessary
-  defp if_string_hex_to_binary([]), do: []
-  defp if_string_hex_to_binary(binaries) when is_list(binaries) do
-    [binary | rest] = binaries
-    [if_string_hex_to_binary(binary) | if_string_hex_to_binary(rest)]
-  end
-  defp if_string_hex_to_binary(binary) do
-    if String.valid?(binary), do: Base.decode16!(binary), else: binary
-  end
-
-  # Reverses a binary
-  def reverse(binary) when is_binary(binary), do: do_reverse(binary, <<>>)
-  defp do_reverse(<<>>, acc), do: acc
-  defp do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)
-
-  # Left pads some binary
-  defp pad_binary(binary, bits) do
-    <<0::size(bits), binary::bitstring>>
   end
 end

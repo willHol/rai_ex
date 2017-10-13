@@ -3,9 +3,9 @@ defmodule RaiEx.Block do
   The block struct and associated functions.
   """
 
-  alias RaiEx.Block
+  import RaiEx.Helpers
 
-  @work_target "ffffffc000000000" |> Base.decode16!(case: :lower)
+  alias RaiEx.Block
 
   @derive {Poison.Encoder, except: [:state]}
   defstruct [
@@ -85,19 +85,4 @@ defmodule RaiEx.Block do
 
     a == 255
   end
-
-  # Converts a hex string to binary if necessary
-  defp if_string_hex_to_binary([]), do: []
-  defp if_string_hex_to_binary(binaries) when is_list(binaries) do
-    [binary | rest] = binaries
-    [if_string_hex_to_binary(binary) | if_string_hex_to_binary(rest)]
-  end
-  defp if_string_hex_to_binary(binary) do
-    if String.valid?(binary), do: Base.decode16!(binary), else: binary
-  end
-
-  # Reverses a binary
-  def reverse(binary) when is_binary(binary), do: do_reverse(binary, <<>>)
-  defp do_reverse(<<>>, acc), do: acc
-  defp do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)
 end
