@@ -1,20 +1,20 @@
 defmodule RaiEx.Tools do
-	@moduledoc """
-	This module is provides convenience functions for
-	working with payments.
-	"""
+  @moduledoc """
+  This module is provides convenience functions for
+  working with payments.
+  """
 
   alias RaiEx.Tools
 
-	@delay 200
+  @delay 200
 
   @doc """
   Generates a wallet seed.
   """
-	def seed do
-		<< int :: size(64) >> = :crypto.strong_rand_bytes(8)
-		int
-	end
+  def seed do
+    << int :: size(64) >> = :crypto.strong_rand_bytes(8)
+    int
+  end
 
   @doc """
   Changes the password for the `wallet`.
@@ -28,30 +28,30 @@ defmodule RaiEx.Tools do
       {:error, reason}
 
   """
-	def change_password(wallet, current_pwd, password) do
-		with {:ok, %{"valid" => "1"}} <- RaiEx.password_enter(wallet, current_pwd),
-			 	 {:ok, %{"changed" => "1"}} <- RaiEx.password_change(wallet, password)
-			 	 do {:ok, wallet} else {_, reason} -> {:error, reason} end
-	end
+  def change_password(wallet, current_pwd, password) do
+    with {:ok, %{"valid" => "1"}} <- RaiEx.password_enter(wallet, current_pwd),
+         {:ok, %{"changed" => "1"}} <- RaiEx.password_change(wallet, password)
+         do {:ok, wallet} else {_, reason} -> {:error, reason} end
+  end
 
   @doc """
   Creates a new encrypted wallet. Locks it with `password`.
   """
-	def wallet_create_encrypted(password) do
-		with {:ok, %{"wallet" => wallet}} <- RaiEx.wallet_create,
-				 _ <- :timer.sleep(@delay),
-				 {:ok, ^wallet} <- change_password(wallet, "", password)
-			   do {:ok, wallet} else {_, reason} -> {:error, reason} end
-	end
+  def wallet_create_encrypted(password) do
+    with {:ok, %{"wallet" => wallet}} <- RaiEx.wallet_create,
+         _ <- :timer.sleep(@delay),
+         {:ok, ^wallet} <- change_password(wallet, "", password)
+         do {:ok, wallet} else {_, reason} -> {:error, reason} end
+  end
 
   @doc """
-  Creates a new adhod wallet.
+  Inserts a new adhoc key into `wallet`.
   """
-	def wallet_add_adhoc(wallet) do
-		with {:ok, %{"private" => priv, "public" => pub, "account" => acc}} <- RaiEx.key_create,
-			   {:ok, %{"account" => ^acc}} <- RaiEx.wallet_add(wallet, priv)
-			   do {:ok, %{"private" => priv, "public" => pub, "account" => acc}} else {_, reason} -> {:error, reason} end
-	end
+  def wallet_add_adhoc(wallet) do
+    with {:ok, %{"private" => priv, "public" => pub, "account" => acc}} <- RaiEx.key_create,
+         {:ok, %{"account" => ^acc}} <- RaiEx.wallet_add(wallet, priv)
+         do {:ok, %{"private" => priv, "public" => pub, "account" => acc}} else {_, reason} -> {:error, reason} end
+  end
 
   @doc """
   Unlocks the given wallet with its `password`.
@@ -59,7 +59,7 @@ defmodule RaiEx.Tools do
   def unlock_wallet(wallet, password) do
     case RaiEx.password_enter(wallet, password) do
       {:ok, %{"valid" => "1"}} ->
-				{:ok, wallet}
+        {:ok, wallet}
       {:ok, %{"valid" => "0"}} ->
         {:error, :invalid}
       {:error, reason} ->
@@ -90,21 +90,45 @@ defmodule RaiEx.Tools do
 
   """
   def address_valid?(address) do
-    {check, sum} = 
+    {_pre, checksum} = 
       address
       |> String.trim("xrb_")
       |> String.split_at(-8)
 
     try do
-      <<_drop::size(4), keep::binary>> = Tools.Base.decode!(check)
+      computed_checksum =
+        address
+        |> address_to_public_without_trim()
+        |> Tools.Base.compute_checksum!()
 
-      computed_checksum = Tools.Base.compute_checksum!(keep)
-      attached_checksum =Tools.Base.decode!(sum) |> reverse()
+      attached_checksum = Tools.Base.decode!(checksum) |> reverse()
 
       computed_checksum == attached_checksum
     rescue
       _ -> false
     end
+  end
+
+  @doc """
+  Converts a raiblocks address to a public key.
+  """
+  def address_to_public(address) do
+    binary = address_to_public_without_trim(address)
+    binary_part(binary, 0, byte_size(binary) - 5)
+  end
+
+  @doc """
+  Same as `address_to_public` except leaves untrimmied 5 bytes on end of binary.
+  """
+  def address_to_public_without_trim(address) do
+    binary =
+      address
+      |> String.trim("xrb_")
+      |> Tools.Base.decode!()
+
+    <<_drop::size(4), pub_key::binary>> = binary
+
+    pub_key
   end
 
   @doc """
@@ -122,7 +146,7 @@ defmodule RaiEx.Tools do
   """
   def create_address!(pub_key) do
     # This allows both a binary input or hex string
-    pub_key = if String.valid?(pub_key), do: Base.decode16!(pub_key), else: pub_key
+    pub_key = if_string_hex_to_binary(pub_key)
 
     encoded_check =
       pub_key
@@ -152,7 +176,7 @@ defmodule RaiEx.Tools do
   """
   def derive_public(priv_key) do
     # This allows both a binary input or hex string
-    priv_key = if String.valid?(priv_key), do: Base.decode16!(priv_key), else: priv_key
+    priv_key = if_string_hex_to_binary(priv_key)
     
     Ed25519.derive_public_key(priv_key)
   end
@@ -168,12 +192,51 @@ defmodule RaiEx.Tools do
   """
   def seed_account(seed, nonce) do
     # This allows both a binary input or hex string
-    seed = if String.valid?(seed), do: Base.decode16!(seed), else: seed
+    seed = if_string_hex_to_binary(seed)
 
     priv = Blake2.hash2b(seed <> <<nonce::size(32)>>, 32)
     pub  = derive_public(priv)
 
-    {pub, priv} 
+    {priv, pub} 
+  end
+
+
+
+  def send_block(%{
+    type: type,
+    previous: previous,
+    destination: destination,
+    balance: balance,
+    work: work,
+    signature: signature
+  }) do
+      
+  end
+
+  def sign_block(%{
+    type: type,
+    previous: previous,
+    destination: destination,
+    balance: balance,
+    work: work,
+    signature: signature
+  }, priv_key, pub_key \\ nil) do
+    # Converts binaries if necessary
+    [priv_key, pub_key, previous, destination, balance] =
+      if_string_hex_to_binary([priv_key, pub_key, previous, destination, balance])
+
+    hash = Blake2.hash2b(previous <> destination <> balance, 32)
+    Ed25519.signature(hash, priv_key, pub_key)
+  end
+
+  # Converts a hex string to binary if necessary
+  defp if_string_hex_to_binary([]), do: []
+  defp if_string_hex_to_binary(binaries) when is_list(binaries) do
+    [binary | rest] = binaries
+    [if_string_hex_to_binary(binary) | if_string_hex_to_binary(rest)]
+  end
+  defp if_string_hex_to_binary(binary) do
+    if String.valid?(binary), do: Base.decode16!(binary), else: binary
   end
 
   # Reverses a binary
