@@ -1,7 +1,6 @@
 defmodule RaiEx.Tools do
   @moduledoc """
-  This module provides convenience functions for
-  working with payments.
+  This module provides convenience functions for working with a RaiBlocks node.
   """
 
   import RaiEx.Helpers

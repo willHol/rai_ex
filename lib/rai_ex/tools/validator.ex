@@ -17,10 +17,8 @@ defmodule RaiEx.Tools.Validator do
     :any => {__MODULE__, :any}
   }
 
-  def any(_), do: true
-
   @doc """
-  Validates the type types used by `RaiEx.RPC`. Raises `.ArgumentError`
+  Validates the type types used by `RaiEx.RPC`. Raises `ArgumentError`
   if the types fail to validate.
 
   ## Examples
@@ -67,4 +65,7 @@ defmodule RaiEx.Tools.Validator do
   def is_hash_list(hash_list) do
     if is_list(hash_list), do: hash_list |> Enum.all?(&(is_hash(&1))), else: false
   end
+
+  @doc false
+  def any(_), do: true
 end

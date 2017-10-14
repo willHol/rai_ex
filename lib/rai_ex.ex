@@ -1,10 +1,27 @@
 defmodule RaiEx do
   @moduledoc """
   This module contains the definitions of all the RaiBlocks node RPC calls.
+
+  ## Usage
+
+  All functions in this module return tuples. The best way to extract the
+  return values is with pattern matching. Keep in mind that the values are all
+  *encoded as strings*.
+
+  ### Examples
+
+      {:ok, %{"wallet" => wallet}} = RaiEx.wallet_create()
+
+      {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
+
+      # Node is unreachable
+      iex> RaiEx.wallet_create()
+      {:error, :econnrefused}
+
   """
 
   import HTTPoison
-  use RPC
+  use RaiEx.RPC
 
   alias HTTPoison.Response
   alias HTTPoison.Error

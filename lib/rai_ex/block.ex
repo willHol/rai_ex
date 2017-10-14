@@ -29,6 +29,8 @@ defmodule RaiEx.Block do
       # Get the previous block hash
       {:ok, %{"frontier" => block_hash}} = RaiEx.account_info(address)
 
+      # Somewhat counterintuitively 'balance' refers to the new balance not the
+      # amount to be sent
       block = %Block{
         previous: block_hash,
         destination: "xrb_1aewtdjz8knar65gmu6xo5tmp7ijrur1fgtetua3mxqujh5z9m1r77fsrpqw",
@@ -38,9 +40,9 @@ defmodule RaiEx.Block do
       # Signs and broadcasts the block to the network
       block |> Block.sign(priv, pub) |> Block.send()
 
-  Now all the funds from the first account have been transferred to:
+  Now *all the funds* from the first account have been transferred to:
 
-  `"xrb_1aewtdjz8knar65gmu6xo5tmp7ijrur1fgtetua3mxqujh5z9m1r77fsrpqw"`. 
+  `"xrb_1aewtdjz8knar65gmu6xo5tmp7ijrur1fgtetua3mxqujh5z9m1r77fsrpqw"`
 
   """
 
