@@ -73,7 +73,6 @@ defmodule RaiEx.Block do
     previous: previous,
     destination: destination,
     balance: balance,
-    source: source,
     work: work,
     hash: hash,
     signature: signature,

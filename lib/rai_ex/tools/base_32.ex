@@ -1,4 +1,4 @@
-defmodule RaiEx.Tools.Base do
+defmodule RaiEx.Tools.Base32 do
   @moduledoc """
   This module provides functions for dealing with encoding and decoding, RaiDice base32.
   """

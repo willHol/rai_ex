@@ -101,9 +101,9 @@ defmodule RaiEx.Tools do
       computed_checksum =
         address
         |> address_to_public_without_trim()
-        |> Tools.Base.compute_checksum!()
+        |> Tools.Base32.compute_checksum!()
 
-      attached_checksum = Tools.Base.decode!(checksum) |> reverse()
+      attached_checksum = Tools.Base32.decode!(checksum) |> reverse()
 
       computed_checksum == attached_checksum
     rescue
@@ -126,7 +126,7 @@ defmodule RaiEx.Tools do
     binary =
       address
       |> String.trim("xrb_")
-      |> Tools.Base.decode!()
+      |> Tools.Base32.decode!()
 
     <<_drop::size(4), pub_key::binary>> = binary
 
@@ -135,7 +135,7 @@ defmodule RaiEx.Tools do
 
   @doc """
   Creates an address from the given *public key*. The address is encoded in
-  base32 as defined in `RaiEx.Tools.Base` and appended with a checksum.
+  base32 as defined in `RaiEx.Tools.Base32` and appended with a checksum.
 
   ## Examples
 
@@ -152,14 +152,14 @@ defmodule RaiEx.Tools do
 
     encoded_check =
       pub_key
-      |> Tools.Base.compute_checksum!
+      |> Tools.Base32.compute_checksum!
       |> reverse()
-      |> Tools.Base.encode!()
+      |> Tools.Base32.encode!()
 
     encoded_address =
       pub_key
       |> pad_binary(4)
-      |> Tools.Base.encode!
+      |> Tools.Base32.encode!
 
     "xrb_#{encoded_address <> encoded_check}"
   end
