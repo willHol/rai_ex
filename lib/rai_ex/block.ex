@@ -163,8 +163,14 @@ defmodule RaiEx.Block do
   end
   def send(%Block{}), do: {:error, :already_sent}
 
-  def recv(%Block{previous: previous, source: source}) do
-    
+  def recv(%Block{destination: destination} = block) do
+    {:ok, %{"frontier" => frontier}} = RaiEx.account_info(destination)
+
+    {:ok, %{"work" => work}} = RaiEx.work_generate(frontier)
+
+    IO.inspect %{block | previous: frontier, work: work}
+
+    {:ok, %{}} = RaiEx.process(Poison.encode!(%{block | previous: frontier, work: work}))
   end
 
   @doc """
