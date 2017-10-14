@@ -11,7 +11,6 @@ defmodule RaiEx.Block do
     * `work` - the proof of work, e.g. "266063092558d903"
     * `signature` - the signed block digest/hash
     * `hash` - the block digest/hash
-    * `source` - the source of the block
     * `state` - the state of the block, can be: `:unsent` or `:sent`
 
   """
@@ -20,7 +19,7 @@ defmodule RaiEx.Block do
 
   alias RaiEx.Block
 
-  @derive {Poison.Encoder, except: [:state, :source, :hash]}
+  @derive {Poison.Encoder, except: [:state, :hash]}
   defstruct [
     type: "send",
     previous: nil,
@@ -29,7 +28,6 @@ defmodule RaiEx.Block do
     work: nil,
     signature: nil,
     hash: nil,
-    source: nil,
     state: :unsent
   ]
 
