@@ -14,7 +14,7 @@ defmodule RaiEx.Block do
     * `source` - the source of the block
     * `state` - the state of the block, can be: `:unsent` or `:sent`
 
-  ### Send a block
+  ## Send a block
 
       alias RaiEx.Tools
       alias RaiEx.Block
@@ -44,6 +44,13 @@ defmodule RaiEx.Block do
 
   `"xrb_1aewtdjz8knar65gmu6xo5tmp7ijrur1fgtetua3mxqujh5z9m1r77fsrpqw"`
 
+  ## Receive the most recent pending block.
+
+      {:ok, %{"blocks" => [block_hash]}} = RaiEx.pending(address, 1)
+
+      {:ok, %{"contents" => block_raw}} = RaiEx.block(block_hash)
+
+      block_raw |> Poison.decode!() |> Map.put("type", "receive") |> Block.from_map() |> Block.sign(priv, pub)
   """
 
   import RaiEx.Helpers
@@ -52,7 +59,7 @@ defmodule RaiEx.Block do
 
   @derive {Poison.Encoder, except: [:state, :hash]}
   defstruct [
-    type: :send,
+    type: "send",
     previous: nil,
     destination: nil,
     balance: 0,
@@ -78,9 +85,25 @@ defmodule RaiEx.Block do
   end
 
   @doc """
-  Signs a block.
+  Processes the block. Automatically invokes the correct processing function.
   """
-  def sign(%Block{
+  def process(%Block{type: "send"} = block), do: send(block)
+  def process(%Block{type: "receive"} = block), do: recv(block)
+
+  @doc """
+  Signs the block. Automatically invokes the correct signing function.
+  """
+  def sign(%Block{type: "send"} = block, priv_key, pub_key \\ nil) do
+    sign_send(block, priv_key, pub_key)
+  end
+  def sign(%Block{type: "receive"} = block, priv_key, pub_key) do
+    sign_recv(block, priv_key, pub_key)
+  end
+
+  @doc """
+  Signs a send block.
+  """
+  def sign_send(%Block{
     previous: previous,
     destination: destination,
     balance: balance,
@@ -90,15 +113,30 @@ defmodule RaiEx.Block do
       if_string_hex_to_binary([priv_key, pub_key, previous])
 
     hash = Blake2.hash2b(previous <> RaiEx.Tools.address_to_public(destination) <> <<balance::size(128)>>, 32)
-    signature  = Ed25519.signature(hash, priv_key, pub_key)
+    signature = Ed25519.signature(hash, priv_key, pub_key)
 
     %{block | hash: Base.encode16(hash), signature: Base.encode16(signature)}
   end
 
   @doc """
-  Processes the block. Automatically invokes `RaiEx.Block.send/1`.
+  Signs a receive block.
   """
-  def process(%Block{type: :send} = block), do: send(block)
+  def sign_recv(%Block{
+    previous: previous,
+    destination: destination,
+    source: source
+  } = block, priv_key, pub_key \\ nil) do
+    source = source || RaiEx.Tools.address_to_public(destination)
+
+    [priv_key, pub_key, previous, source] =
+      if_string_hex_to_binary([priv_key, pub_key, previous, source])
+
+    hash = Blake2.hash2b(previous <> source, 32)
+    signature = Ed25519.signature(hash, priv_key, pub_key)
+
+    %{block | hash: Base.encode16(hash), signature: Base.encode16(signature),
+      source: Base.encode16(source)}
+  end
 
   @doc """
   Sends a block.
@@ -117,13 +155,17 @@ defmodule RaiEx.Block do
   } = block) do
     {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
 
-    block = %{block | work: work, balance: Base.encode16(<<block.balance::size(128)>>), state: :sent}
+    block = %{block | work: work, state: :sent}
 
     {:ok, %{}} = RaiEx.process(Poison.encode!(block))
 
     block
   end
   def send(%Block{}), do: {:error, :already_sent}
+
+  def recv(%Block{previous: previous, source: source}) do
+    
+  end
 
   @doc """
   Generates a `RaiEx.Block` struct from a map.
