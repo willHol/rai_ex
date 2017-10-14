@@ -76,7 +76,7 @@ defmodule RaiEx do
   @doc """
   Moves accounts from `source` to `wallet`.
 
-  Node must have 'enable_control' set to 'true'
+  Node must have *enable_control* set to 'true'
   """
   rpc :account_move do
     param "wallet", :wallet
@@ -109,7 +109,7 @@ defmodule RaiEx do
   @doc """
   Sets the representative for `account` in `wallet`.
 
-  Node must have 'enable_control' set to 'true'
+  Node must have *enable_control* set to 'true'
   """
   rpc :account_representative_set do
     param "wallet", :wallet
@@ -373,7 +373,7 @@ defmodule RaiEx do
   @doc """
   Receive pending block for account in wallet
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :receive do
     param "wallet", :wallet
@@ -384,7 +384,7 @@ defmodule RaiEx do
   @doc """
   Returns receive minimum for node.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :receive_minimum do
   end
@@ -412,7 +412,7 @@ defmodule RaiEx do
   @doc """
   Sets the default representative for wallet.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_representative_set do
     param "wallet", :wallet
@@ -458,7 +458,7 @@ defmodule RaiEx do
   end
 
   @doc """
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :stop do
   end
@@ -524,7 +524,7 @@ defmodule RaiEx do
   @doc """
   Clear unchecked synchronizing blocks.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :unchecked_clear do
   end
@@ -547,7 +547,7 @@ defmodule RaiEx do
   @doc """
   Add an adhoc private key key to wallet.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_add do
     param "wallet", :wallet
@@ -571,7 +571,7 @@ defmodule RaiEx do
   @doc """
   Changes seed for wallet to seed.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_change_seed do
     param "wallet", :wallet
@@ -589,7 +589,7 @@ defmodule RaiEx do
   @doc """
   Creates a new random wallet id.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_create do
   end
@@ -597,7 +597,7 @@ defmodule RaiEx do
   @doc """
   Destroys wallet and all contained accounts.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_destroy do
     param "wallet", :wallet
@@ -621,7 +621,7 @@ defmodule RaiEx do
   @doc """
   Returns a list of block hashes which have not yet been received by accounts in this wallet.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_pending do
     param "wallet", :wallet
@@ -631,7 +631,7 @@ defmodule RaiEx do
   @doc """
   Returns a list of pending block hashes with amount more or equal to threshold.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_pending do
     param "wallet", :wallet
@@ -642,7 +642,7 @@ defmodule RaiEx do
   @doc """
   Rebroadcast blocks for accounts from wallet starting at frontier down to count to the network.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_republish do
     param "wallet", :wallet
@@ -652,7 +652,7 @@ defmodule RaiEx do
   @doc """
   Returns a list of pairs of account and work from wallet.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :wallet_work_get do
     param "wallet", :wallet
@@ -661,7 +661,7 @@ defmodule RaiEx do
   @doc """
   Changes the password for wallet to password.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :password_change do
     param "wallet", :wallet
@@ -686,7 +686,7 @@ defmodule RaiEx do
   @doc """
   Stop generating work for block.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :work_cancel do
     param "hash", :hash
@@ -695,7 +695,7 @@ defmodule RaiEx do
   @doc """
   Generates work for block
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :work_generate do
     param "hash", :hash, timeout: 30000
@@ -704,7 +704,7 @@ defmodule RaiEx do
   @doc """
   Retrieves work for account in wallet.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :work_get do
     param "wallet", :wallet
@@ -714,7 +714,7 @@ defmodule RaiEx do
   @doc """
   Set work for account in wallet.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :work_set do
     param "wallet", :wallet
@@ -725,7 +725,7 @@ defmodule RaiEx do
   @doc """
   Add specific IP address and port as work peer for node until restart.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :work_peer_add do
     param "address", :string
@@ -735,7 +735,7 @@ defmodule RaiEx do
   @doc """
   Retrieves work peers.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :work_peers do
   end
@@ -743,7 +743,7 @@ defmodule RaiEx do
   @doc """
   Clear work peers node list until restart.
   
-  enable_control must be set to true
+  *enable_control* must be set to true
   """
   rpc :work_peers_clear do
   end
