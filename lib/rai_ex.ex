@@ -76,7 +76,7 @@ defmodule RaiEx do
   @doc """
   Moves accounts from `source` to `wallet`.
 
-  # Node must have 'enable_control' set to 'true'
+  Node must have 'enable_control' set to 'true'
   """
   rpc :account_move do
     param "wallet", :wallet
@@ -109,7 +109,7 @@ defmodule RaiEx do
   @doc """
   Sets the representative for `account` in `wallet`.
 
-  # Node must have 'enable_control' set to 'true'
+  Node must have 'enable_control' set to 'true'
   """
   rpc :account_representative_set do
     param "wallet", :wallet
@@ -141,7 +141,7 @@ defmodule RaiEx do
   @doc """
   Returns a list of block hashes which have not yet been received by these `accounts`.
 
-  # Optional `threshold`, only returns hashes with amounts >= threshold.
+  Optional `threshold`, only returns hashes with amounts >= threshold.
   """
   rpc :accounts_pending do
     param "accounts", :address_list
