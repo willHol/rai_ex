@@ -1,13 +1,26 @@
 defmodule RaiEx.Block do
   @moduledoc """
   The block struct and associated functions.
+
+  ## Fields
+
+    * `type` - the block type, default: "send"
+    * `previous` - the previous block hash, e.g. 9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904
+    * `destination` - the destination address, e.g. xrb_34bmpi65zr967cdzy4uy4twu7mqs9nrm53r1penffmuex6ruqy8nxp7ms1h1
+    * `balance` - the amount to send, measured in RAW
+    * `work` - the proof of work, e.g. "266063092558d903"
+    * `signature` - the signed block digest/hash
+    * `hash` - the block digest/hash
+    * `source` - the source of the block
+    * `state` - the state of the block, can be: `:unsent` or `:sent`
+
   """
 
   import RaiEx.Helpers
 
   alias RaiEx.Block
 
-  @derive {Poison.Encoder, except: [:state]}
+  @derive {Poison.Encoder, except: [:state, :source, :hash]}
   defstruct [
     type: "send",
     previous: nil,
@@ -21,6 +34,20 @@ defmodule RaiEx.Block do
   ]
 
   @doc """
+  Allows the use of `Enum.into` for inserting map values into a `Block`.
+  """
+  defimpl Collectable, for: Block do
+    def into(original) do
+      {original, fn
+        block, {:cont, {k, v}} when is_atom(k) -> %{block | k => v}
+        block, {:cont, {k, v}} when is_binary(k) -> %{block | String.to_atom(k) => v}
+        block, :done -> block
+        _, :halt -> :ok
+      end}
+    end
+  end
+
+  @doc """
   Signs a block.
   """
   def sign_block(%Block{
@@ -29,13 +56,13 @@ defmodule RaiEx.Block do
     balance: balance,
   } = block, priv_key, pub_key \\ nil) do
     # Converts binaries if necessary
-    [priv_key, pub_key, previous, destination, balance] =
-      if_string_hex_to_binary([priv_key, pub_key, previous, destination, balance])
+    [priv_key, pub_key, previous, balance] =
+      if_string_hex_to_binary([priv_key, pub_key, previous, balance])
 
-    hash = Blake2.hash2b(previous <> destination <> balance, 32)
+    hash = Blake2.hash2b(previous <> RaiEx.Tools.address_to_public(destination) <> balance, 32)
     signature  = Ed25519.signature(hash, priv_key, pub_key)
 
-    %{block | hash: hash, signature: signature}
+    %{block | hash: Base.encode16(hash), signature: Base.encode16(signature)}
   end
 
   @doc """
@@ -54,11 +81,15 @@ defmodule RaiEx.Block do
     signature: signature,
     state: :unsent
   } = block) do
-    {:ok, %{"work" => work}} = RaiEx.work_generate(hash)
+    {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
 
-    RaiEx.process(%{block | work: work})
+    RaiEx.process(Poison.encode!(%{block | work: work}))
   end
   def send_block(%Block{}), do: {:error, :already_sent}
+
+  def from_map(%{} = map) do
+    Enum.into(map, %Block{})
+  end
 
   @doc false
   def generate_work(%Block{hash: nil}), do: :not_hashed

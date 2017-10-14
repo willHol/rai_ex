@@ -1,6 +1,6 @@
 defmodule RaiEx.Tools do
   @moduledoc """
-  This module is provides convenience functions for
+  This module provides convenience functions for
   working with payments.
   """
 
