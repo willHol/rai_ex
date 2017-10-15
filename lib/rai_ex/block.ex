@@ -16,11 +16,12 @@ defmodule RaiEx.Block do
 
   ## Send a block
 
-      alias RaiEx.Tools
-      alias RaiEx.Block
+      alias RaiEx.{Block, Tools}
+
+      seed = "9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904"
 
       # Generate a private and public keypair from a wallet seed
-      {priv, pub} = Tools.seed_account("9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904", 0)
+      {priv, pub} = Tools.seed_account(seed, 0)
 
       # Derives an "xrb_" address
       address = Tools.create_address!(pub)
@@ -43,7 +44,17 @@ defmodule RaiEx.Block do
 
   `"xrb_1aewtdjz8knar65gmu6xo5tmp7ijrur1fgtetua3mxqujh5z9m1r77fsrpqw"`
 
-  ## Receive the most recent pending block.
+  ## Receive the most recent pending block
+
+      alias RaiEx.{Block, Tools}
+
+      seed = "9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904"
+
+      # Generate a private and public keypair from a wallet seed
+      {priv, pub} = Tools.seed_account(seed, 1)
+
+      # Derives an "xrb_" address
+      address = Tools.create_address!(pub)
 
       {:ok, %{"blocks" => [block_hash]}} = RaiEx.pending(address, 1)
       {:ok, %{"frontier" => frontier}} = RaiEx.account_info(address)
@@ -54,8 +65,32 @@ defmodule RaiEx.Block do
         source: block_hash
       }
 
-      block |> Block.sign(priv, pub) |> Block.process
+      block |> Block.sign(priv, pub) |> Block.process()
 
+  ## Open an account
+
+      alias RaiEx.{Block, Tools}
+
+      seed = "9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904"
+      representative = "xrb_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4"
+
+      # Generate a private and public keypair from a wallet seed
+      {priv, pub} = Tools.seed_account(seed, 10)
+
+      # Derives an "xrb_" address
+      address = Tools.create_address!(pub)
+
+      {:ok, %{"frontiers" => frontiers}} = RaiEx.frontiers(address, 1)
+      {:ok, frontier} = frontiers |> Map.values() |> Enum.fetch(0)
+
+      block = %Block{
+        type: "open",
+        account: address,
+        source: frontier,
+        representative: representative
+      }
+
+      block |> Block.sign(priv, pub) |> Block.process()
   """
 
   import RaiEx.Helpers
@@ -67,11 +102,13 @@ defmodule RaiEx.Block do
     type: "send",
     previous: nil,
     destination: nil,
-    balance: 0,
+    balance: nil,
     work: nil,
     source: nil,
     signature: nil,
     hash: nil,
+    representative: nil,
+    account: nil,
     state: :unsent
   ]
 
@@ -94,6 +131,7 @@ defmodule RaiEx.Block do
   """
   def process(%Block{type: "send"} = block), do: send(block)
   def process(%Block{type: "receive"} = block), do: recv(block)
+  def process(%Block{type: "open"} = block), do: open(block)
 
   @doc """
   Signs the block. Automatically invokes the correct signing function.
@@ -103,6 +141,9 @@ defmodule RaiEx.Block do
   end
   def sign(%Block{type: "receive"} = block, priv_key, pub_key) do
     sign_recv(block, priv_key, pub_key)
+  end
+  def sign(%Block{type: "open"} = block, priv_key, pub_key) do
+    sign_open(block, priv_key, pub_key)
   end
 
   @doc """
@@ -120,7 +161,7 @@ defmodule RaiEx.Block do
     hash = Blake2.hash2b(previous <> RaiEx.Tools.address_to_public(destination) <> <<balance::size(128)>>, 32)
     signature = Ed25519.signature(hash, priv_key, pub_key)
 
-    %{block | hash: Base.encode16(hash), signature: Base.encode16(signature)}
+    %{block | balance: Base.encode16(<<balance::size(128)>>), hash: Base.encode16(hash), signature: Base.encode16(signature)}
   end
 
   @doc """
@@ -138,6 +179,23 @@ defmodule RaiEx.Block do
 
     %{block | hash: Base.encode16(hash), signature: Base.encode16(signature),
       source: Base.encode16(source)}
+  end
+
+  @doc """
+  Signs an open block.
+  """
+  def sign_open(%Block{
+    source: source,
+    representative: representative,
+    account: account
+  } = block, priv_key, pub_key \\ nil) do
+    [source] =
+      if_string_hex_to_binary([source])
+
+    hash = Blake2.hash2b(source <> RaiEx.Tools.address_to_public(representative) <> RaiEx.Tools.address_to_public(account), 32)
+    signature = Ed25519.signature(hash, priv_key, pub_key)
+
+    %{block | source: Base.encode16(source), hash: Base.encode16(hash), signature: Base.encode16(signature)}
   end
 
   @doc """
@@ -169,13 +227,33 @@ defmodule RaiEx.Block do
   Receives a block.
   """
   def recv(%Block{destination: destination, signature: signature, source: source, previous: previous} = block) do
-    {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
+   {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
 
     {:ok, %{}} = RaiEx.process(Poison.encode!(%{
       previous: previous,
       signature: signature,
       source: source,
       type: "receive",
+      work: work
+    }))
+
+    %{block | work: work}
+  end
+
+  def open(%Block{
+    source: source,
+    representative: representative,
+    account: account,
+    signature: signature
+  } = block) do
+    {:ok, %{"work" => work}} = RaiEx.work_generate(source)
+
+    {:ok, %{}} = RaiEx.process(Poison.encode!(%{
+      account: account,
+      representative: representative,
+      signature: signature,
+      source: source,
+      type: "open",
       work: work
     }))
 
