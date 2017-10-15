@@ -99,12 +99,20 @@ defmodule RaiEx.Block do
       # The open block
       block = %Block{
         type: "open",
-        account: existing_address,
+        account: new_address,
         source: send_block.hash,
         representative: representative
       }
 
-      block |> Block.sign(priv_new, pub_new) |> Block.process()
+      open_block = block |> Block.sign(priv_new, pub_new) |> Block.process()
+
+      receive_block = %Block{
+        type: "receive",
+        previous: open_block.hash,
+        source: send_block.hash
+      }
+
+      receive_block |> Block.sign(priv_new, pub_new) |> Block.process()
 
   """
 
