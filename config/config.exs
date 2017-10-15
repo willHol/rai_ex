@@ -5,6 +5,3 @@ use Mix.Config
 config :rai_ex,
   default_port: 7076,
   localhost: "127.0.0.1"
-
-config :ed25519,
-  hash_fn: {Blake2, :hash2b, []}

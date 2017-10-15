@@ -1,6 +1,9 @@
 defmodule RaiEx.Mixfile do
   use Mix.Project
 
+  # Somewhat hacky way of setting env variables of ed25519
+  Application.put_env(:ed25519, :hash_fn, {Blake2, :hash2b, [], []})
+
   def project do
     [
       app: :rai_ex,
