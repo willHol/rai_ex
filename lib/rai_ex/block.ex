@@ -75,22 +75,37 @@ defmodule RaiEx.Block do
       representative = "xrb_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4"
 
       # Generate a private and public keypair from a wallet seed
-      {priv, pub} = Tools.seed_account(seed, 10)
+      {priv_existing, pub_existing} = Tools.seed_account(seed, 1)
+      {priv_new, pub_new} = Tools.seed_account(seed, 10)
 
-      # Derives an "xrb_" address
-      address = Tools.create_address!(pub)
+      existing_address = Tools.create_address!(pub_existing)
+      new_address = Tools.create_address!(pub_new)
 
-      {:ok, %{"frontiers" => frontiers}} = RaiEx.frontiers(address, 1)
-      {:ok, frontier} = frontiers |> Map.values() |> Enum.fetch(0)
+      {:ok, %{"frontier" => block_hash, "balance" => balance}} = RaiEx.account_info(existing_address)
 
+      # Convert to number
+      {balance, ""} = Integer.parse(balance)
+
+      # We need to generate a send block to the new address
+      block = %Block{
+        previous: block_hash,
+        destination: new_address,
+        balance: balance
+      }
+
+      # Signs and broadcasts the block to the network
+      send_block = block |> Block.sign(priv_existing, pub_existing) |> Block.send()
+
+      # The open block
       block = %Block{
         type: "open",
         account: address,
-        source: frontier,
+        source: send_block.hash,
         representative: representative
       }
 
-      block |> Block.sign(priv, pub) |> Block.process()
+      block |> Block.sign(priv_new, pub_new) |> Block.process()
+
   """
 
   import RaiEx.Helpers
@@ -256,6 +271,15 @@ defmodule RaiEx.Block do
       type: "open",
       work: work
     }))
+
+    IO.inspect %{
+      account: account,
+      representative: representative,
+      signature: signature,
+      source: source,
+      type: "open",
+      work: work
+    }
 
     %{block | work: work}
   end
