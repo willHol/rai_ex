@@ -50,7 +50,18 @@ defmodule RaiEx.Block do
 
       {:ok, %{"contents" => block_raw}} = RaiEx.block(block_hash)
 
-      block_raw |> Poison.decode!() |> Map.put("type", "receive") |> Block.from_map() |> Block.sign(priv, pub)
+      {:ok, %{"frontier" => frontier}} = RaiEx.account_info(address)
+
+      block_sent = Poison.decode!(block_raw)
+
+      block = %Block{
+        type: "receive",
+        previous: frontier,
+        source: block_hash
+      }
+
+      block |> Block.sign(priv, pub) |> Block.process
+
   """
 
   import RaiEx.Helpers
@@ -123,11 +134,8 @@ defmodule RaiEx.Block do
   """
   def sign_recv(%Block{
     previous: previous,
-    destination: destination,
     source: source
   } = block, priv_key, pub_key \\ nil) do
-    source = source || RaiEx.Tools.address_to_public(destination)
-
     [priv_key, pub_key, previous, source] =
       if_string_hex_to_binary([priv_key, pub_key, previous, source])
 
@@ -163,14 +171,18 @@ defmodule RaiEx.Block do
   end
   def send(%Block{}), do: {:error, :already_sent}
 
-  def recv(%Block{destination: destination} = block) do
-    {:ok, %{"frontier" => frontier}} = RaiEx.account_info(destination)
+  def recv(%Block{destination: destination, signature: signature, source: source, previous: previous} = block) do
+    {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
 
-    {:ok, %{"work" => work}} = RaiEx.work_generate(frontier)
+    {:ok, %{}} = RaiEx.process(Poison.encode!(%{
+      previous: previous,
+      signature: signature,
+      source: source,
+      type: "receive",
+      work: work
+    }))
 
-    IO.inspect %{block | previous: frontier, work: work}
-
-    {:ok, %{}} = RaiEx.process(Poison.encode!(%{block | previous: frontier, work: work}))
+    # {:ok, %{}} = RaiEx.process(Poison.encode!(%{block | previous: frontier, work: work}))
   end
 
   @doc """
