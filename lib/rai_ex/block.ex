@@ -76,7 +76,7 @@ defmodule RaiEx.Block do
 
       # Generate a private and public keypair from a wallet seed
       {priv_existing, pub_existing} = Tools.seed_account(seed, 1)
-      {priv_new, pub_new} = Tools.seed_account(seed, 10)
+      {priv_new, pub_new} = Tools.seed_account(seed, 100)
 
       existing_address = Tools.create_address!(pub_existing)
       new_address = Tools.create_address!(pub_new)
@@ -99,7 +99,7 @@ defmodule RaiEx.Block do
       # The open block
       block = %Block{
         type: "open",
-        account: address,
+        account: existing_address,
         source: send_block.hash,
         representative: representative
       }
