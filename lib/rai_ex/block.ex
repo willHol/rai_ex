@@ -20,8 +20,7 @@ defmodule RaiEx.Block do
       alias RaiEx.Block
 
       # Generate a private and public keypair from a wallet seed
-      {priv, pub} = Tools.seed_account(
-        "9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904", 0)
+      {priv, pub} = Tools.seed_account("9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904", 0)
 
       # Derives an "xrb_" address
       address = Tools.create_address!(pub)
@@ -47,12 +46,7 @@ defmodule RaiEx.Block do
   ## Receive the most recent pending block.
 
       {:ok, %{"blocks" => [block_hash]}} = RaiEx.pending(address, 1)
-
-      {:ok, %{"contents" => block_raw}} = RaiEx.block(block_hash)
-
       {:ok, %{"frontier" => frontier}} = RaiEx.account_info(address)
-
-      block_sent = Poison.decode!(block_raw)
 
       block = %Block{
         type: "receive",
@@ -171,6 +165,9 @@ defmodule RaiEx.Block do
   end
   def send(%Block{}), do: {:error, :already_sent}
 
+  @doc """
+  Receives a block.
+  """
   def recv(%Block{destination: destination, signature: signature, source: source, previous: previous} = block) do
     {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
 
@@ -182,7 +179,7 @@ defmodule RaiEx.Block do
       work: work
     }))
 
-    # {:ok, %{}} = RaiEx.process(Poison.encode!(%{block | previous: frontier, work: work}))
+    %{block | work: work}
   end
 
   @doc """
