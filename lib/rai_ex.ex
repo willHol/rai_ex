@@ -36,7 +36,7 @@ defmodule RaiEx do
   alias HTTPoison.Error
 
   @headers [{"Content-Type", "application/json"}]
-  @options [recv_time: 5000, timeout: 10000]
+  @options [recv_time: 5000, timeout: 10_000]
   @default_url "http://localhost:7076"
   @wait_time 75
   @retry_count 3
@@ -724,7 +724,7 @@ defmodule RaiEx do
   *enable_control* must be set to true
   """
   rpc :work_generate do
-    param "hash", :hash, [recv_time: 600000, timeout: 600000]
+    param "hash", :hash, [recv_time: 600_000, timeout: 600_000]
   end
 
   @doc """
@@ -784,7 +784,7 @@ defmodule RaiEx do
 
   # Parses a URL into its fully qualified form
   defp parse_url(url) do
-    case String.splitter(url, ["://", ":"]) |> Enum.take(3) do
+    case url |> String.splitter(["://", ":"]) |> Enum.take(3) do
       ["http", "localhost", port] -> "http://#{local_host()}:#{port}"
       ["http", host, port] -> "http://#{host}:#{port}"
       ["http", host] -> "http://#{host}:#{default_port()}"

@@ -46,7 +46,7 @@ defmodule RaiEx.RPC do
 
       unquote(definition)
 
-      param_to_type_keywords = Module.get_attribute(__MODULE__, unquote(action)) |> Enum.reverse()
+      param_to_type_keywords = Enum.reverse(Module.get_attribute(__MODULE__, unquote(action)))
 
       opts = Module.get_attribute(__MODULE__, :"#{@current_action}_opts") || []
 
