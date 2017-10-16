@@ -176,7 +176,7 @@ defmodule RaiEx.Block do
 
     hash = Blake2.hash2b(
       previous <>
-      RaiEx.Tools.address_to_public(destination) <> <<balance::size(128)>>, 32
+      RaiEx.Tools.address_to_public!(destination) <> <<balance::size(128)>>, 32
     )
     signature = Ed25519.signature(hash, priv_key, pub_key)
 
@@ -217,8 +217,8 @@ defmodule RaiEx.Block do
 
     hash = Blake2.hash2b(
       source <>
-      RaiEx.Tools.address_to_public(representative) <>
-      RaiEx.Tools.address_to_public(account), 32
+      RaiEx.Tools.address_to_public!(representative) <>
+      RaiEx.Tools.address_to_public!(account), 32
     )
     signature = Ed25519.signature(hash, priv_key, pub_key)
 
@@ -247,11 +247,7 @@ defmodule RaiEx.Block do
   @doc """
   Receives a block.
   """
-  def recv(%Block{
-    signature: signature,
-    source: source,
-    previous: previous
-  } = block) do
+  def recv(%Block{previous: previous} = block) do
     with {:ok, %{"work" => work}} <- RaiEx.work_generate(previous),
          {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work}))
          do
@@ -265,13 +261,8 @@ defmodule RaiEx.Block do
   @doc """
   Opens a block.
   """
-  def open(%Block{
-    source: source,
-    representative: representative,
-    account: account,
-    signature: signature
-  } = block) do
-    work_target = account |> Tools.address_to_public() |> Base.encode16()
+  def open(%Block{account: account} = block) do
+    work_target = account |> Tools.address_to_public!() |> Base.encode16()
 
     with {:ok, %{"work" => work}} <- RaiEx.work_generate(work_target),
          {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work}))

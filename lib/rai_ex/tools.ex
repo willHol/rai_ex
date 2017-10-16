@@ -113,7 +113,7 @@ defmodule RaiEx.Tools do
   Converts a raiblocks address to a public key.
   """
   def address_to_public!(address) do
-    binary = address_to_public_without_trim(address)
+    binary = address_to_public_without_trim!(address)
     binary_part(binary, 0, byte_size(binary) - 5)
   end
 
@@ -167,14 +167,14 @@ defmodule RaiEx.Tools do
 
   ## Examples
 
-      iex> derive_public(<<84, 151, 51, 84, 136, 206, 7, 211, 66, 222, 10, 240, 159, 113, 36, 98, 93, 238, 29, 96, 95, 8, 33, 62, 53, 162, 139, 52, 75, 123, 38, 144>>)
+      iex> derive_public!(<<84, 151, 51, 84, 136, 206, 7, 211, 66, 222, 10, 240, 159, 113, 36, 98, 93, 238, 29, 96, 95, 8, 33, 62, 53, 162, 139, 52, 75, 123, 38, 144>>)
       <<125, 169, 163, 231, 136, 75, 168, 59, 83, 105, 128, 71, 82, 149, 53, 87, 90, 35, 149, 51, 106, 243, 76, 13, 250, 28, 59, 128, 5, 181, 81, 116>>
   
-      iex> derive_public("5497335488CE07D342DE0AF09F7124625DEE1D605F08213E35A28B344B7B2690")
+      iex> derive_public!("5497335488CE07D342DE0AF09F7124625DEE1D605F08213E35A28B344B7B2690")
       <<125, 169, 163, 231, 136, 75, 168, 59, 83, 105, 128, 71, 82, 149, 53, 87, 90, 35, 149, 51, 106, 243, 76, 13, 250, 28, 59, 128, 5, 181, 81, 116>>
 
   """
-  def derive_public(priv_key) do
+  def derive_public!(priv_key) do
     # This allows both a binary input or hex string
     priv_key = if_string_hex_to_binary(priv_key)
     
@@ -186,16 +186,16 @@ defmodule RaiEx.Tools do
 
   ## Examples
 
-      iex> seed_account("8208BD79655E7141DCFE792084AB6A8FDFFFB56F37CE30ADC4C2CC940E276A8B", 0)
+      iex> seed_account!("8208BD79655E7141DCFE792084AB6A8FDFFFB56F37CE30ADC4C2CC940E276A8B", 0)
       {pub, priv}
 
   """
-  def seed_account(seed, nonce) do
+  def seed_account!(seed, nonce) do
     # This allows both a binary input or hex string
     seed = if_string_hex_to_binary(seed)
 
     priv = Blake2.hash2b(seed <> <<nonce::size(32)>>, 32)
-    pub  = derive_public(priv)
+    pub  = derive_public!(priv)
 
     {priv, pub} 
   end
