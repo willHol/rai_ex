@@ -1,6 +1,6 @@
 # RaiEx
 
-An *Elixir client* for managing a **RaiBlocks** node, here is an example:
+RaiEx is an *Elixir client* for managing a **RaiBlocks** node, here is an example:
 
 ```elixir
 

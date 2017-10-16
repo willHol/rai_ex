@@ -234,13 +234,14 @@ defmodule RaiEx.Block do
     previous: previous,
     state: :unsent
   } = block) do
-    {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
-
-    block = %{block | work: work, state: :sent}
-
-    {:ok, %{}} = RaiEx.process(Poison.encode!(block))
-
-    block
+    with {:ok, %{"work" => work}} <- RaiEx.work_generate(previous),
+         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work))
+         do
+           %{block | work: work, state: :sent}
+         else
+           {:error, reason} ->
+              %{block | state: {:error, reason}}
+         end 
   end
 
   @doc """
@@ -251,17 +252,14 @@ defmodule RaiEx.Block do
     source: source,
     previous: previous
   } = block) do
-   {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
-
-    {:ok, %{}} = RaiEx.process(Poison.encode!(%{
-      previous: previous,
-      signature: signature,
-      source: source,
-      type: "receive",
-      work: work
-    }))
-
-    %{block | work: work, state: :sent}
+    with {:ok, %{"work" => work}} <- RaiEx.work_generate(previous),
+         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work))
+         do
+           %{block | work: work, state: :sent}
+         else
+           {:error, reason} ->
+              %{block | state: {:error, reason}}
+         end 
   end
 
   @doc """
@@ -273,19 +271,16 @@ defmodule RaiEx.Block do
     account: account,
     signature: signature
   } = block) do
-    {:ok, %{"work" => work}} =
-      RaiEx.work_generate(Base.encode16(Tools.address_to_public(account)))
+    work_target = account |> Tools.address_to_public() |> Base.encode16()
 
-    {:ok, %{}} = RaiEx.process(Poison.encode!(%{
-      account: account,
-      representative: representative,
-      signature: signature,
-      source: source,
-      type: "open",
-      work: work
-    }))
-
-    %{block | work: work, state: :sent}
+    with {:ok, %{"work" => work}} <- RaiEx.work_generate(work_target),
+         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work))
+         do
+           %{block | work: work, state: :sent}
+         else
+           {:error, reason} ->
+              %{block | state: {:error, reason}}
+         end    
   end
 
   @doc """
