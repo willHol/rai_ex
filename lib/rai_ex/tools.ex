@@ -5,7 +5,7 @@ defmodule RaiEx.Tools do
 
   import RaiEx.Helpers
 
-  alias RaiEx.Tools
+  alias RaiEx.{Block, Tools}
 
   @delay 200
 
