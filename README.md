@@ -1,5 +1,6 @@
 # RaiEx
 [![Build Status](https://travis-ci.org/willHol/rai_ex.svg?branch=master)](https://travis-ci.org/willHol/rai_ex)
+[![Hex.pm](https://img.shields.io/hexpm/v/rai_ex.svg)](https://hex.pm/packages/rai_ex)
 
 RaiEx is an *Elixir client* for managing a **RaiBlocks** node, here is an example:
 
