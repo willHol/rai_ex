@@ -76,7 +76,7 @@ defmodule RaiEx.Block do
 
       # Generate a private and public keypair from a wallet seed
       {priv_existing, pub_existing} = Tools.seed_account(seed, 1)
-      {priv_new, pub_new} = Tools.seed_account(seed, 100)
+      {priv_new, pub_new} = Tools.seed_account(seed, 2)
 
       existing_address = Tools.create_address!(pub_existing)
       new_address = Tools.create_address!(pub_new)
@@ -104,21 +104,14 @@ defmodule RaiEx.Block do
         representative: representative
       }
 
+      # Broadcast to the network
       open_block = block |> Block.sign(priv_new, pub_new) |> Block.process()
-
-      receive_block = %Block{
-        type: "receive",
-        previous: open_block.hash,
-        source: send_block.hash
-      }
-
-      receive_block |> Block.sign(priv_new, pub_new) |> Block.process()
 
   """
 
   import RaiEx.Helpers
 
-  alias RaiEx.Block
+  alias RaiEx.{Block, Tools}
 
   @derive {Poison.Encoder, except: [:state, :hash]}
   defstruct [
@@ -159,15 +152,16 @@ defmodule RaiEx.Block do
   @doc """
   Signs the block. Automatically invokes the correct signing function.
   """
-  def sign(%Block{type: "send"} = block, priv_key, pub_key \\ nil) do
+  def sign(%Block{type: "send", state: :unsent} = block, priv_key, pub_key \\ nil) do
     sign_send(block, priv_key, pub_key)
   end
-  def sign(%Block{type: "receive"} = block, priv_key, pub_key) do
+  def sign(%Block{type: "receive", state: :unsent} = block, priv_key, pub_key) do
     sign_recv(block, priv_key, pub_key)
   end
-  def sign(%Block{type: "open"} = block, priv_key, pub_key) do
+  def sign(%Block{type: "open", state: :unsent} = block, priv_key, pub_key) do
     sign_open(block, priv_key, pub_key)
   end
+  def sign(%Block{}, _priv, _pub), do: :error
 
   @doc """
   Signs a send block.
@@ -177,14 +171,20 @@ defmodule RaiEx.Block do
     destination: destination,
     balance: balance,
   } = block, priv_key, pub_key \\ nil) do
-    # Converts binaries if necessary
     [priv_key, pub_key, previous] =
       if_string_hex_to_binary([priv_key, pub_key, previous])
 
-    hash = Blake2.hash2b(previous <> RaiEx.Tools.address_to_public(destination) <> <<balance::size(128)>>, 32)
+    hash = Blake2.hash2b(
+      previous <>
+      RaiEx.Tools.address_to_public(destination) <> <<balance::size(128)>>, 32
+    )
     signature = Ed25519.signature(hash, priv_key, pub_key)
 
-    %{block | balance: Base.encode16(<<balance::size(128)>>), hash: Base.encode16(hash), signature: Base.encode16(signature)}
+    %{block |
+      balance: Base.encode16(<<balance::size(128)>>),
+      hash: Base.encode16(hash),
+      signature: Base.encode16(signature)
+    }
   end
 
   @doc """
@@ -212,13 +212,17 @@ defmodule RaiEx.Block do
     representative: representative,
     account: account
   } = block, priv_key, pub_key \\ nil) do
-    [source] =
-      if_string_hex_to_binary([source])
+    [priv_key, pub_key, source] =
+      if_string_hex_to_binary([priv_key, pub_key, source])
 
-    hash = Blake2.hash2b(source <> RaiEx.Tools.address_to_public(representative) <> RaiEx.Tools.address_to_public(account), 32)
+    hash = Blake2.hash2b(
+      source <>
+      RaiEx.Tools.address_to_public(representative) <>
+      RaiEx.Tools.address_to_public(account), 32
+    )
     signature = Ed25519.signature(hash, priv_key, pub_key)
 
-    %{block | source: Base.encode16(source), hash: Base.encode16(hash), signature: Base.encode16(signature)}
+    %{block | hash: Base.encode16(hash), signature: Base.encode16(signature)}
   end
 
   @doc """
@@ -249,7 +253,12 @@ defmodule RaiEx.Block do
   @doc """
   Receives a block.
   """
-  def recv(%Block{destination: destination, signature: signature, source: source, previous: previous} = block) do
+  def recv(%Block{
+    destination: destination,
+    signature: signature,
+    source: source,
+    previous: previous
+  } = block) do
    {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
 
     {:ok, %{}} = RaiEx.process(Poison.encode!(%{
@@ -260,7 +269,7 @@ defmodule RaiEx.Block do
       work: work
     }))
 
-    %{block | work: work}
+    %{block | work: work, state: :sent}
   end
 
   def open(%Block{
@@ -269,7 +278,8 @@ defmodule RaiEx.Block do
     account: account,
     signature: signature
   } = block) do
-    {:ok, %{"work" => work}} = RaiEx.work_generate(source)
+    {:ok, %{"work" => work}} =
+      RaiEx.work_generate(Base.encode16(Tools.address_to_public(account)))
 
     {:ok, %{}} = RaiEx.process(Poison.encode!(%{
       account: account,
@@ -280,16 +290,7 @@ defmodule RaiEx.Block do
       work: work
     }))
 
-    IO.inspect %{
-      account: account,
-      representative: representative,
-      signature: signature,
-      source: source,
-      type: "open",
-      work: work
-    }
-
-    %{block | work: work}
+    %{block | work: work, state: :sent}
   end
 
   @doc """
@@ -297,31 +298,5 @@ defmodule RaiEx.Block do
   """
   def from_map(%{} = map) do
     Enum.into(map, %Block{})
-  end
-
-  @doc false
-  def generate_work(%Block{hash: nil}), do: :not_hashed
-  def generate_work(%Block{hash: hash}) do
-    max_iterations = 274877906945
-
-    try do
-      1..max_iterations
-      |> Enum.reduce(:notfound, fn i, result ->
-        IO.puts i
-        if work_valid?(<<i::size(64)>>, hash) do
-          throw <<i::size(64)>>
-        end
-      end)
-    catch
-      work -> work
-    end
-  end
-
-  @doc false
-  def work_valid?(work, hash) do
-    bin = Blake2.hash2b(work <> hash, 8)
-    <<a, b, c, d, _rest::binary>> = reverse(bin)
-
-    a == 255
   end
 end
