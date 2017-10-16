@@ -128,9 +128,6 @@ defmodule RaiEx.Block do
     state: :unsent
   ]
 
-  @doc """
-  Allows the use of `Enum.into` for inserting map values into a `Block`.
-  """
   defimpl Collectable, for: Block do
     def into(original) do
       {original, fn
@@ -152,7 +149,8 @@ defmodule RaiEx.Block do
   @doc """
   Signs the block. Automatically invokes the correct signing function.
   """
-  def sign(%Block{type: "send", state: :unsent} = block, priv_key, pub_key \\ nil) do
+  def sign(block, priv_key, pub_key \\ nil)
+  def sign(%Block{type: "send", state: :unsent} = block, priv_key, pub_key) do
     sign_send(block, priv_key, pub_key)
   end
   def sign(%Block{type: "receive", state: :unsent} = block, priv_key, pub_key) do
@@ -231,13 +229,7 @@ defmodule RaiEx.Block do
   def send(%Block{hash: nil}), do: raise ArgumentError
   def send(%Block{signature: nil}), do: raise ArgumentError
   def send(%Block{
-    type: type,
     previous: previous,
-    destination: destination,
-    balance: balance,
-    work: work,
-    hash: hash,
-    signature: signature,
     state: :unsent
   } = block) do
     {:ok, %{"work" => work}} = RaiEx.work_generate(previous)
@@ -254,7 +246,6 @@ defmodule RaiEx.Block do
   Receives a block.
   """
   def recv(%Block{
-    destination: destination,
     signature: signature,
     source: source,
     previous: previous
