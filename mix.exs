@@ -56,7 +56,8 @@ defmodule RaiEx.Mixfile do
       {:decimal, "~> 1.4"},
       {:blake2, "~> 1.0"},
       {:ed25519, "~> 1.1"},
-      {:credo, "~> 0.8.8", only: :dev, runtime: false}
+      {:credo, "~> 0.8.8", only: :dev, runtime: false},
+      {:inch_ex, only: :docs}
     ]
   end
 end
