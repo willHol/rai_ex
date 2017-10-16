@@ -7,7 +7,7 @@
 RaiEx is an *Elixir client* for managing a **RaiBlocks** node, here is an example:
 
 ```elixir
-alias RaiEx.Tools
+alias RaiEx.{Block, Tools}
 
 account = "xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3"
 
