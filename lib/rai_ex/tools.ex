@@ -16,7 +16,7 @@ defmodule RaiEx.Tools do
     :crypto.strong_rand_bytes(32)
   end
 
-  def open_account({priv_existing, pub_existing}, {priv_new, pub_new}) do
+  def open_account({priv_existing, pub_existing}, {priv_new, pub_new}, representative \\ "xrb_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4") do
     existing_account = Tools.create_account!(pub_existing)
     new_account = Tools.create_account!(pub_new)
 
