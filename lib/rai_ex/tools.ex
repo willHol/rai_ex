@@ -98,7 +98,7 @@ defmodule RaiEx.Tools do
     try do
       computed_checksum =
         address
-        |> address_to_public_without_trim()
+        |> address_to_public_without_trim!()
         |> hash_checksum!()
 
       attached_checksum = Tools.Base32.decode!(checksum) |> reverse()
@@ -112,15 +112,15 @@ defmodule RaiEx.Tools do
   @doc """
   Converts a raiblocks address to a public key.
   """
-  def address_to_public(address) do
+  def address_to_public!(address) do
     binary = address_to_public_without_trim(address)
     binary_part(binary, 0, byte_size(binary) - 5)
   end
 
   @doc """
-  Same as `address_to_public` except leaves untrimmied 5 bytes at end of binary.
+  Same as `RaiEx.Tools.address_to_public!` except leaves untrimmied 5 bytes at end of binary.
   """
-  def address_to_public_without_trim(address) do
+  def address_to_public_without_trim!(address) do
     binary =
       address
       |> String.trim("xrb_")

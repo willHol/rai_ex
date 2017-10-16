@@ -235,7 +235,7 @@ defmodule RaiEx.Block do
     state: :unsent
   } = block) do
     with {:ok, %{"work" => work}} <- RaiEx.work_generate(previous),
-         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work))
+         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work}))
          do
            %{block | work: work, state: :sent}
          else
@@ -253,7 +253,7 @@ defmodule RaiEx.Block do
     previous: previous
   } = block) do
     with {:ok, %{"work" => work}} <- RaiEx.work_generate(previous),
-         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work))
+         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work}))
          do
            %{block | work: work, state: :sent}
          else
@@ -274,7 +274,7 @@ defmodule RaiEx.Block do
     work_target = account |> Tools.address_to_public() |> Base.encode16()
 
     with {:ok, %{"work" => work}} <- RaiEx.work_generate(work_target),
-         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work))
+         {:ok, %{}} <- RaiEx.process(Poison.encode!(%{block | work: work}))
          do
            %{block | work: work, state: :sent}
          else
