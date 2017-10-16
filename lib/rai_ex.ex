@@ -6,7 +6,8 @@ defmodule RaiEx do
 
   All functions in this module return tuples. The best way to extract the
   return values is with pattern matching. Keep in mind that the values are all
-  *encoded as strings*.
+  *encoded as strings*. If a rpc call *times out*, it will be resent after a short
+  delay.
 
   ### Examples
 
@@ -14,9 +15,17 @@ defmodule RaiEx do
 
       {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
 
+      # All functions come with two matching clauses
+      {:ok, %{"frontiers" => frontiers}} = RaiEx.accounts_frontiers([account], 1)
+      {:ok, %{"frontiers" => frontiers}} = RaiEx.accounts_frontiers(accounts: [account], count: 1)
+
       # Node is unreachable
       iex> RaiEx.wallet_create()
       {:error, :econnrefused}
+
+      # RPC returns an error
+      iex> RaiEx.wallet_create()
+      {:error, reason}
 
   """
 
@@ -812,7 +821,11 @@ defmodule RaiEx do
     with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, comb_opts),
          {:ok, map} <- Poison.decode(body)
          do
-          {:ok, map}
+          case map do
+            # Returns rpc errors as error tuples
+            {:ok, %{"error" => e}} -> {:error, e}
+            _ -> {:ok, map}
+          end
          else
           {:error, %Error{reason: reason}} ->
             :timer.sleep(@wait_time)

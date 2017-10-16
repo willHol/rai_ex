@@ -75,7 +75,7 @@ defmodule RaiEx.RPC do
   def __build_keyword_func__(action, list, opts) do
     quote do
       def unquote(action) (unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list))) do
-        RaiEx.Tools.Validator.validate_types(unquote(list), unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list)))
+        RaiEx.Tools.Validator.validate_types!(unquote(list), unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list)))
 
         unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list))
         |> Enum.into(%{})
@@ -90,7 +90,7 @@ defmodule RaiEx.RPC do
   def __build_seq_func__(action, list, opts) do
     quote do
       def unquote(action) (unquote_splicing(RaiEx.RPC.__seq_args_from_keyword__(__MODULE__, list))) do
-        RaiEx.Tools.Validator.validate_types(unquote(list), unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list)))
+        RaiEx.Tools.Validator.validate_types!(unquote(list), unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list)))
 
         unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list))
         |> Enum.into(%{})

@@ -30,7 +30,7 @@ defmodule RaiEx.Tools.Validator do
       ** (Elixir.ArgumentError)
 
   """
-  def validate_types(should_be, is) do
+  def validate_types!(should_be, is) do
     should_be = Enum.into(should_be, %{})
     Enum.map(should_be, fn {param, type} ->
       {mod, fun} = @type_checkers[type]
@@ -53,7 +53,10 @@ defmodule RaiEx.Tools.Validator do
 
   @doc false
   def is_address(addr) do
-    is_binary(addr) and String.length(addr) == 64 and Regex.match?(~r/^[0-9a-z_]+$/, addr) and String.starts_with?(addr, "xrb_")
+    is_binary(addr) and
+    String.length(addr) == 64 and
+    Regex.match?(~r/^[0-9a-z_]+$/, addr) and
+    String.starts_with?(addr, "xrb_")
   end
 
   @doc false

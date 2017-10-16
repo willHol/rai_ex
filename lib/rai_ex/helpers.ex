@@ -1,5 +1,7 @@
 defmodule RaiEx.Helpers do
-  @moduledoc """
+  @moduledoc false
+
+  @doc """
   Converts hex string(s) to binary if necessary.
   """
   def if_string_hex_to_binary([]), do: []
@@ -15,8 +17,8 @@ defmodule RaiEx.Helpers do
   Reverses a binary.
   """
   def reverse(binary) when is_binary(binary), do: do_reverse(binary, <<>>)
-  def do_reverse(<<>>, acc), do: acc
-  def do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)
+  defp do_reverse(<<>>, acc), do: acc
+  defp do_reverse(<< x :: binary-size(1), bin :: binary >>, acc), do: do_reverse(bin, x <> acc)
 
   @doc """
   Left pads a binary.

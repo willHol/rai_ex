@@ -13,8 +13,7 @@ defmodule RaiEx.Tools do
   Generates a wallet seed.
   """
   def seed do
-    << int :: size(64) >> = :crypto.strong_rand_bytes(8)
-    int
+    :crypto.strong_rand_bytes(32)
   end
 
   @doc """
@@ -100,7 +99,7 @@ defmodule RaiEx.Tools do
       computed_checksum =
         address
         |> address_to_public_without_trim()
-        |> Tools.Base32.compute_checksum!()
+        |> hash_checksum!()
 
       attached_checksum = Tools.Base32.decode!(checksum) |> reverse()
 
@@ -138,20 +137,20 @@ defmodule RaiEx.Tools do
 
   ## Examples
 
-      iex> create_address!(<<125, 169, 163, 231, 136, 75, 168, 59, 83, 105, 128, 71, 82, 149, 53, 87, 90, 35, 149, 51, 106, 243, 76, 13, 250, 28, 59, 128, 5, 181, 81, 116>>)
+      iex> create_account!(<<125, 169, 163, 231, 136, 75, 168, 59, 83, 105, 128, 71, 82, 149, 53, 87, 90, 35, 149, 51, 106, 243, 76, 13, 250, 28, 59, 128, 5, 181, 81, 116>>)
       "xrb_1zfbnhmrikxa9fbpm149cccmcott6gcm8tqmbi8zn93ui14ucndn93mtijeg"
 
       iex> create_address!("7DA9A3E7884BA83B53698047529535575A2395336AF34C0DFA1C3B8005B55174")
       "xrb_1zfbnhmrikxa9fbpm149cccmcott6gcm8tqmbi8zn93ui14ucndn93mtijeg"
 
   """
-  def create_address!(pub_key) do
+  def create_account!(pub_key) do
     # This allows both a binary input or hex string
     pub_key = if_string_hex_to_binary(pub_key)
 
     encoded_check =
       pub_key
-      |> Tools.Base32.compute_checksum!
+      |> hash_checksum!
       |> reverse()
       |> Tools.Base32.encode!()
 
@@ -199,5 +198,9 @@ defmodule RaiEx.Tools do
     pub  = derive_public(priv)
 
     {priv, pub} 
+  end
+
+  defp hash_checksum!(check) do
+    Blake2.hash2b(check, 5)
   end
 end

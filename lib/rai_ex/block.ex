@@ -11,7 +11,9 @@ defmodule RaiEx.Block do
     * `work` - the proof of work, e.g. "266063092558d903"
     * `signature` - the signed block digest/hash
     * `hash` - the block digest/hash
-    * `source` - the source of the block
+    * `source` - the source hash for a receive block
+    * `representative` - the representative for an open block
+    * `account` - the account for an open block
     * `state` - the state of the block, can be: `:unsent` or `:sent`
 
   ## Send a block
@@ -24,7 +26,7 @@ defmodule RaiEx.Block do
       {priv, pub} = Tools.seed_account(seed, 0)
 
       # Derives an "xrb_" address
-      address = Tools.create_address!(pub)
+      address = Tools.create_account!(pub)
       
       # Get the previous block hash
       {:ok, %{"frontier" => block_hash}} = RaiEx.account_info(address)
@@ -53,11 +55,11 @@ defmodule RaiEx.Block do
       # Generate a private and public keypair from a wallet seed
       {priv, pub} = Tools.seed_account(seed, 1)
 
-      # Derives an "xrb_" address
-      address = Tools.create_address!(pub)
+      # Derives an "xrb_" account
+      account = Tools.create_account!(pub)
 
-      {:ok, %{"blocks" => [block_hash]}} = RaiEx.pending(address, 1)
-      {:ok, %{"frontier" => frontier}} = RaiEx.account_info(address)
+      {:ok, %{"blocks" => [block_hash]}} = RaiEx.pending(account, 1)
+      {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
 
       block = %Block{
         type: "receive",
@@ -78,10 +80,10 @@ defmodule RaiEx.Block do
       {priv_existing, pub_existing} = Tools.seed_account(seed, 1)
       {priv_new, pub_new} = Tools.seed_account(seed, 2)
 
-      existing_address = Tools.create_address!(pub_existing)
-      new_address = Tools.create_address!(pub_new)
+      existing_account = Tools.create_account!(pub_existing)
+      new_account = Tools.create_account!(pub_new)
 
-      {:ok, %{"frontier" => block_hash, "balance" => balance}} = RaiEx.account_info(existing_address)
+      {:ok, %{"frontier" => block_hash, "balance" => balance}} = RaiEx.account_info(existing_account)
 
       # Convert to number
       {balance, ""} = Integer.parse(balance)
@@ -89,7 +91,7 @@ defmodule RaiEx.Block do
       # We need to generate a send block to the new address
       block = %Block{
         previous: block_hash,
-        destination: new_address,
+        destination: new_account,
         balance: balance
       }
 
@@ -99,7 +101,7 @@ defmodule RaiEx.Block do
       # The open block
       block = %Block{
         type: "open",
-        account: new_address,
+        account: new_account,
         source: send_block.hash,
         representative: representative
       }
@@ -240,7 +242,6 @@ defmodule RaiEx.Block do
 
     block
   end
-  def send(%Block{}), do: {:error, :already_sent}
 
   @doc """
   Receives a block.
@@ -263,6 +264,9 @@ defmodule RaiEx.Block do
     %{block | work: work, state: :sent}
   end
 
+  @doc """
+  Opens a block.
+  """
   def open(%Block{
     source: source,
     representative: representative,
