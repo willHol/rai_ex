@@ -16,6 +16,37 @@ defmodule RaiEx.Tools do
     :crypto.strong_rand_bytes(32)
   end
 
+  def open_account({priv_existing, pub_existing}, {priv_new, pub_new}) do
+    existing_account = Tools.create_account!(pub_existing)
+    new_account = Tools.create_account!(pub_new)
+
+    {:ok, %{"frontier" => block_hash, "balance" => balance}} = RaiEx.account_info(existing_account)
+
+    {balance, ""} = Integer.parse(balance)
+
+    block = %Block{
+      previous: block_hash,
+      destination: new_account,
+      balance: balance
+    }
+
+    # Signs and broadcasts the block to the network
+    send_block = block |> Block.sign(priv_existing, pub_existing) |> Block.send()
+
+    # The open block
+    block = %Block{
+      type: "open",
+      account: new_account,
+      source: send_block.hash,
+      representative: representative
+    }
+
+    # Broadcast to the network
+    open_block = block |> Block.sign(priv_new, pub_new) |> Block.process()
+
+    :ok
+  end
+
   @doc """
   Changes the password for the `wallet`.
 
