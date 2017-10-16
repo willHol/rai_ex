@@ -23,7 +23,7 @@ defmodule RaiEx.Block do
       seed = "9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904"
 
       # Generate a private and public keypair from a wallet seed
-      {priv, pub} = Tools.seed_account(seed, 0)
+      {priv, pub} = Tools.seed_account!(seed, 0)
 
       # Derives an "xrb_" address
       address = Tools.create_account!(pub)
@@ -53,7 +53,7 @@ defmodule RaiEx.Block do
       seed = "9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904"
 
       # Generate a private and public keypair from a wallet seed
-      {priv, pub} = Tools.seed_account(seed, 1)
+      {priv, pub} = Tools.seed_account!(seed, 1)
 
       # Derives an "xrb_" account
       account = Tools.create_account!(pub)
@@ -77,8 +77,8 @@ defmodule RaiEx.Block do
       representative = "xrb_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4"
 
       # Generate a private and public keypair from a wallet seed
-      {priv_existing, pub_existing} = Tools.seed_account(seed, 1)
-      {priv_new, pub_new} = Tools.seed_account(seed, 2)
+      {priv_existing, pub_existing} = Tools.seed_account!(seed, 1)
+      {priv_new, pub_new} = Tools.seed_account!(seed, 2)
 
       existing_account = Tools.create_account!(pub_existing)
       new_account = Tools.create_account!(pub_new)
