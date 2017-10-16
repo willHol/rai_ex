@@ -7,9 +7,7 @@
 RaiEx is an *Elixir client* for managing a **RaiBlocks** node, here is an example:
 
 ```elixir
-
-# Tell RaiEx where to connect to, default is: 'http://127.0.0.1:7076'
-:ok = RaiEx.connect("http://192.165.0.78:4000")
+alias RaiEx.{Block, Tools}
 
 account = "xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3"
 
@@ -18,7 +16,7 @@ account = "xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3"
 {:ok, %{"key" => key}} = RaiEx.account_key(account)
 
 # Derive the first account from the wallet seed
-{priv, pub} = seed_account!("8208BD79655E7141DCFE792084AB6A8FDFFFB56F37CE30ADC4C2CC940E276A8B", 0)
+{priv, pub} = Tools.seed_account!("9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904", 0)
 
 # Derives an "xrb_" address
 address = Tools.create_account!(pub)
