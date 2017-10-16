@@ -1,4 +1,5 @@
-# RaiEx
+![RaiEx](https://raw.githubusercontent.com/willHol/rai_ex/master/logo-wide.png)
+
 [![Build Status](https://travis-ci.org/willHol/rai_ex.svg?branch=master)](https://travis-ci.org/willHol/rai_ex)
 [![Hex.pm](https://img.shields.io/hexpm/v/rai_ex.svg)](https://hex.pm/packages/rai_ex)
 [![Inline docs](http://inch-ci.org/github/willHol/rai_ex.svg)](http://inch-ci.org/github/willHol/rai_ex)
