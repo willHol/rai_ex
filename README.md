@@ -14,7 +14,7 @@ account = "xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3"
 {:ok, %{"key" => key}} = RaiEx.account_key(account)
 
 # Derive the first account from the wallet seed
-{priv, pub} = seed_account("8208BD79655E7141DCFE792084AB6A8FDFFFB56F37CE30ADC4C2CC940E276A8B", 0)
+{priv, pub} = seed_account!("8208BD79655E7141DCFE792084AB6A8FDFFFB56F37CE30ADC4C2CC940E276A8B", 0)
 
 # Derives an "xrb_" address
 address = Tools.create_account!(pub)
