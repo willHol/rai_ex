@@ -6,7 +6,7 @@ defmodule RaiEx do
 
   All functions in this module return tuples. The best way to extract the
   return values is with pattern matching. Keep in mind that the values are all
-  *encoded as strings*. If a rpc call *times out*, it will be resent after a short
+  *encoded as strings*. If an rpc call *times out*, it will be re-sent after a short
   delay.
 
   ### Examples
