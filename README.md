@@ -45,7 +45,7 @@ Add the following to your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:rai_ex, "~> 0.2.0"}
+    {:rai_ex, "~> 0.3.0"}
   ]
 end
 ```
