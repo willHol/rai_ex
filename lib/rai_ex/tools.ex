@@ -120,7 +120,7 @@ defmodule RaiEx.Tools do
       false
 
   """
-  def address_valid?(address) do
+  def account_valid?(address) do
     {_pre, checksum} = 
       address
       |> String.trim("xrb_")
