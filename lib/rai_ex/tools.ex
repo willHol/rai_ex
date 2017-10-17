@@ -179,6 +179,9 @@ defmodule RaiEx.Tools do
     # This allows both a binary input or hex string
     pub_key = if_string_hex_to_binary(pub_key)
 
+    # Pads the binary
+    pad_binary(pub_key, 256 - bit_size(pub_key))
+
     encoded_check =
       pub_key
       |> hash_checksum!()
