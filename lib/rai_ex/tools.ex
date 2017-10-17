@@ -129,11 +129,11 @@ defmodule RaiEx.Tools do
     try do
       computed_checksum =
         address
-        |> address_to_public_without_trim!()
+        |> address_to_public!()
         |> hash_checksum!()
 
       attached_checksum = checksum |> Tools.Base32.decode!() |> reverse()
-
+      
       computed_checksum == attached_checksum
     rescue
       _ -> false
