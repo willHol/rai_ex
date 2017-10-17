@@ -177,10 +177,10 @@ defmodule RaiEx.Tools do
   """
   def create_account!(pub_key) do
     # This allows both a binary input or hex string
-    pub_key = if_string_hex_to_binary(pub_key)
-
-    # Pads the binary
-    pad_binary(pub_key, 256 - bit_size(pub_key))
+    pub_key = 
+      pub_key
+      |> if_string_hex_to_binary()
+      |> right_pad_binary(256 - bit_size(pub_key))
 
     encoded_check =
       pub_key
@@ -190,7 +190,7 @@ defmodule RaiEx.Tools do
 
     encoded_address =
       pub_key
-      |> pad_binary(4)
+      |> left_pad_binary(4)
       |> Tools.Base32.encode!()
 
     "xrb_#{encoded_address <> encoded_check}"
