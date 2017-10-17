@@ -44,7 +44,7 @@ defmodule RaiEx.Tools do
     # Broadcast to the network
     open_block = block |> Block.sign(priv_new, pub_new) |> Block.process()
 
-    :ok
+    new_account
   end
 
   @doc """
@@ -181,14 +181,14 @@ defmodule RaiEx.Tools do
 
     encoded_check =
       pub_key
-      |> hash_checksum!
+      |> hash_checksum!()
       |> reverse()
       |> Tools.Base32.encode!()
 
     encoded_address =
       pub_key
       |> pad_binary(4)
-      |> Tools.Base32.encode!
+      |> Tools.Base32.encode!()
 
     "xrb_#{encoded_address <> encoded_check}"
   end
