@@ -22,7 +22,7 @@ defmodule RaiEx.Tools do
   def send({priv, pub}, to, amount) when is_integer(amount) do
     {:ok, %{"frontier" => block_hash, "balance" => balance}} =
       pub
-      |> create_account()
+      |> create_account!()
       |> RaiEx.account_info()
 
     new_balance = String.to_integer(balance) - amount
