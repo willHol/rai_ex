@@ -39,32 +39,30 @@ defmodule RaiEx.Tools do
   def process_all_pending({priv, pub}) do
     account = create_account!(pub)
 
+    case RaiEx.pending(account, 1000) do
+      {:ok, %{"blocks" => ""}} -> :ok
+      {:ok, %{"blocks" => [first | blocks]}} ->
+        {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
+        
+        block = %Block{
+          type: "receive",
+          previous: frontier,
+          source: first
+        }
+        |> Block.sign(priv, pub)
+        |> Block.process()
 
-    [first | blocks] =
-      case RaiEx.pending(account, 1000) do
-        {:ok, %{"blocks" => ""}} -> :ok
-        {:ok, %{"blocks" => [first | blocks]}} ->
-          {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
-          
+        blocks
+        |> Enum.each(fn receive_hash ->
           block = %Block{
             type: "receive",
-            previous: frontier,
-            source: first
+            previous: block.hash,
+            source: receive_hash
           }
           |> Block.sign(priv, pub)
           |> Block.process()
-
-          blocks
-          |> Enum.each(fn receive_hash ->
-            block = %Block{
-              type: "receive",
-              previous: block.hash,
-              source: receive_hash
-            }
-            |> Block.sign(priv, pub)
-            |> Block.process()
-          end)
-      end
+        end)
+    end
 
     :ok
   end
