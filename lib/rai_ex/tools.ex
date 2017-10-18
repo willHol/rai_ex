@@ -16,35 +16,24 @@ defmodule RaiEx.Tools do
     :crypto.strong_rand_bytes(32)
   end
 
-  def open_account({priv_existing, pub_existing}, {priv_new, pub_new}, representative \\ "xrb_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4") do
-    existing_account = Tools.create_account!(pub_existing)
-    new_account = Tools.create_account!(pub_new)
+  @doc """
+  Sends a certain amount of RAW to `to`.
+  """
+  def send({priv, pub}, to, amount) when is_integer(amount) do
+    {:ok, %{"frontier" => block_hash, "balance" => balance}} =
+      pub
+      |> create_account()
+      |> RaiEx.account_info()
 
-    {:ok, %{"frontier" => block_hash, "balance" => balance}} = RaiEx.account_info(existing_account)
+    new_balance = String.to_integer(balance) - amount
 
-    {balance, ""} = Integer.parse(balance)
-
-    block = %Block{
+    %Block{
       previous: block_hash,
-      destination: new_account,
-      balance: balance
+      destination: to,
+      balance: new_balance
     }
-
-    # Signs and broadcasts the block to the network
-    send_block = block |> Block.sign(priv_existing, pub_existing) |> Block.send()
-
-    # The open block
-    block = %Block{
-      type: "open",
-      account: new_account,
-      source: send_block.hash,
-      representative: representative
-    }
-
-    # Broadcast to the network
-    open_block = block |> Block.sign(priv_new, pub_new) |> Block.process()
-
-    new_account
+    |> Block.sign(priv, pub)
+    |> Block.send()
   end
 
   @doc """
