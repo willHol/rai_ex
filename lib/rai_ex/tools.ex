@@ -36,6 +36,34 @@ defmodule RaiEx.Tools do
     |> Block.send()
   end
 
+  def process_all_pending({priv, pub}) do
+    account = create_account!(pub)
+
+    {:ok, %{"blocks" => [first | blocks]}} = RaiEx.pending(account, 1000)
+    {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
+    
+    block = %Block{
+      type: "receive",
+      previous: frontier,
+      source: first
+    }
+    |> Block.sign(priv, pub)
+    |> Block.process()
+
+    blocks
+    |> Enum.each(fn receive_hash ->
+      block = %Block{
+        type: "receive",
+        previous: block.hash,
+        source: receive_hash
+      }
+      |> Block.sign(priv, pub)
+      |> Block.process()
+    end)
+
+    :ok
+  end
+
   @doc """
   Changes the password for the `wallet`.
 
