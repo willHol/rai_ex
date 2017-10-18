@@ -39,7 +39,13 @@ defmodule RaiEx.Tools do
   def process_all_pending({priv, pub}) do
     account = create_account!(pub)
 
-    {:ok, %{"blocks" => [first | blocks]}} = RaiEx.pending(account, 1000)
+
+    [first | blocks] =
+      case RaiEx.pending(account, 1000) do
+        {:ok, %{"blocks" => ""}} -> []
+        {:ok, %{"blocks" => blocks}} -> blocks
+      end
+      
     {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
     
     block = %Block{
