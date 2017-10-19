@@ -41,23 +41,15 @@ defmodule RaiEx.Tools do
 
     case RaiEx.pending(account, 1000) do
       {:ok, %{"blocks" => ""}} -> :ok
-      {:ok, %{"blocks" => [first | blocks]}} ->
+      {:ok, %{"blocks" => blocks}} ->
         {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
-        
-        block = %Block{
-          type: "receive",
-          previous: frontier,
-          source: first
-        }
-        |> Block.sign(priv, pub)
-        |> Block.process()
 
         blocks
-        |> Enum.each(fn receive_hash ->
-          block = %Block{
+        |> Enum.reduce(frontier, fn receive_hash, frontier ->
+          %Block{
             type: "receive",
-            previous: block.hash,
-            source: receive_hash
+            previous: frontier,
+            source: first
           }
           |> Block.sign(priv, pub)
           |> Block.process()
