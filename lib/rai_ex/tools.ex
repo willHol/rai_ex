@@ -42,7 +42,14 @@ defmodule RaiEx.Tools do
     case RaiEx.pending(account, 1000) do
       {:ok, %{"blocks" => ""}} -> :ok
       {:ok, %{"blocks" => blocks}} ->
-        {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
+        frontier =
+          case RaiEx.account_info(account) do
+            {:ok, %{"frontier" => frontier}} ->
+              frontier
+            {:error, "Account not found"} ->
+              [sent_hash] = blocks
+              open_account({priv, pub}, sent_hash)
+          end
 
         blocks
         |> Enum.reduce(frontier, fn receive_hash, frontier ->
@@ -60,6 +67,22 @@ defmodule RaiEx.Tools do
     end
 
     :ok
+  end
+
+  def open_account({priv, pub}, sent_hash) do
+    # The open block
+    block =
+      %Block{
+        type: "open",
+        account: create_account!(pub),
+        source: sent_hash,
+        representative: Application.get_env(:rai_ex, :representative,
+            "xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3")
+      }
+      |> Block.sign(priv, pub)
+      |> Block.process()
+
+    block.hash
   end
 
   @doc """

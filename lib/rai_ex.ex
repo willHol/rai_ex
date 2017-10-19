@@ -823,7 +823,7 @@ defmodule RaiEx do
          do
           case map do
             # Returns rpc errors as error tuples
-            {:ok, %{"error" => e}} -> {:error, e}
+            %{"error" => e} -> {:error, e}
             _ -> {:ok, map}
           end
          else
