@@ -46,13 +46,16 @@ defmodule RaiEx.Tools do
 
         blocks
         |> Enum.reduce(frontier, fn receive_hash, frontier ->
-          %Block{
-            type: "receive",
-            previous: frontier,
-            source: first
-          }
-          |> Block.sign(priv, pub)
-          |> Block.process()
+          block = 
+            %Block{
+              type: "receive",
+              previous: frontier,
+              source: receive_hash
+            }
+            |> Block.sign(priv, pub)
+            |> Block.process()
+
+          block.hash
         end)
     end
 
