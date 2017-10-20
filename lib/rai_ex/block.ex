@@ -153,16 +153,22 @@ defmodule RaiEx.Block do
   Signs the block. Automatically invokes the correct signing function.
   """
   def sign(block, priv_key, pub_key \\ nil)
+
   def sign(%Block{type: "send", state: :unsent} = block, priv_key, pub_key) do
     sign_send(block, priv_key, pub_key)
   end
+
   def sign(%Block{type: "receive", state: :unsent} = block, priv_key, pub_key) do
     sign_recv(block, priv_key, pub_key)
   end
+
   def sign(%Block{type: "open", state: :unsent} = block, priv_key, pub_key) do
     sign_open(block, priv_key, pub_key)
   end
-  def sign(%Block{}, _priv, _pub), do: :error
+
+  def sign(%Block{}, _priv, _pub) do
+    raise ArgumentError, message: "unrecognised block type"
+  end
 
   @doc """
   Signs a send block.
