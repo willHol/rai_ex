@@ -144,7 +144,7 @@ defmodule RaiEx.Block do
   @doc """
   Processes the block. Automatically invokes the correct processing function.
   """
-  def process(%Block{state: {:error, reason}} = block), do: block
+  def process(%Block{state: {:error, _reason}} = block), do: block
   def process(%Block{type: "send"} = block), do: send(block)
   def process(%Block{type: "receive"} = block), do: recv(block)
   def process(%Block{type: "open"} = block), do: open(block)
