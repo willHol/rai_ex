@@ -15,8 +15,18 @@ defmodule RaiEx.BlockTest do
     "hash" => "8F23E5790F995C38D4CC68E85932FA92025813713DEFE8D8E82368272F11C072"
   }
 
+  @valid_recv %{
+    "previous" => "6483B198E6CEF20727E0601D217E5E12598355F9C194B4CF9F75BE347FFCE4F9",
+    "signature" => "6F700603E21105949A68E30FC3818B9E03B81D788983526ACFF457F67945C177ACE02B4DECCB1ED73FC1B10E02CACC2FA78A5535EA5232708C3E360C22F17305",
+    "source" => "193ADF01F896E9955614F275738FCA63E684D3DE5FEB01398C55CD240D9210AB",
+    "type" => "receive",
+    "work" => "39bb3a33be963d66",
+    # non-standard, just for tests
+    "hash" => "5FA957F257DD62A4582A50E20206214D06F9E26167A11D76E60C392EC5695360"
+  }
+
   describe "Block.sign/3 " do
-    setup context do
+    setup _context do
       {priv, pub} = Tools.seed_account!(@seed, 0)
       account = Tools.create_account!(pub)
 
@@ -28,7 +38,7 @@ defmodule RaiEx.BlockTest do
       }
     end
 
-    test "correctly signs a send block", %{acc: account, priv: priv, pub: pub} do
+    test "correctly signs a send block", %{priv: priv, pub: pub} do
       block =
         %Block{
           type: "send",
@@ -40,6 +50,19 @@ defmodule RaiEx.BlockTest do
 
       assert block.hash === @valid_send["hash"]
       assert block.signature === @valid_send["signature"]
+    end
+
+    test "correctly signs a receive block", %{priv: priv, pub: pub} do
+      block =
+        %Block{
+          type: "receive",
+          previous: @valid_recv["previous"],
+          source: @valid_recv["source"],
+        }
+        |> Block.sign(priv, pub)
+
+      assert block.hash === @valid_recv["hash"]
+      assert block.signature === @valid_recv["signature"]
     end
   end
 end
