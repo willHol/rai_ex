@@ -88,6 +88,10 @@ defmodule RaiEx.BlockTest do
   end
 
   describe "Block.process/1 " do
+    import TestHelper
+
+    skip_offline()
+
     test "processes a send block", %{priv: priv, pub: pub} do
       block =
         %Block{
@@ -102,6 +106,8 @@ defmodule RaiEx.BlockTest do
       assert block.state === :sent
     end
 
+    skip_offline()
+
     test "processes a receive block", %{priv: priv, pub: pub} do
       block =
         %Block{
@@ -114,6 +120,8 @@ defmodule RaiEx.BlockTest do
 
       assert block.state === :sent
     end
+
+    skip_offline()
 
     test "processes an open block", %{priv: priv, pub: pub} do
       block =
