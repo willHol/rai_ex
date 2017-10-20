@@ -150,7 +150,8 @@ defmodule RaiEx.Block do
   def process(%Block{type: "open"} = block), do: open(block)
 
   @doc """
-  Signs the block. Automatically invokes the correct signing function.
+  Signs the block. Automatically invokes the correct signing function. Raises
+  `ArgumentError` if the type is not recognised.
   """
   def sign(block, priv_key, pub_key \\ nil)
 

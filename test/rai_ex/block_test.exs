@@ -36,20 +36,16 @@ defmodule RaiEx.BlockTest do
     "hash" => "1653FC490D5AE8786F659D646D49639F0DE13DCC98470D6FA3234D175B85526F"
   }
 
+  setup _context do
+    {priv, pub} = Tools.seed_account!(@seed, 0)
+    account = Tools.create_account!(pub)
+
+    # Passed to all tests
+    {:ok, %{acc: account, priv: priv, pub: pub}}
+  end
+
   describe "Block.sign/3 " do
-    setup _context do
-      {priv, pub} = Tools.seed_account!(@seed, 0)
-      account = Tools.create_account!(pub)
-
-      # Passed to all tests
-      {:ok, %{
-        acc: account,
-        priv: priv,
-        pub: pub}
-      }
-    end
-
-    test "correctly signs a send block", %{priv: priv, pub: pub} do
+    test "signs a send block", %{priv: priv, pub: pub} do
       block =
         %Block{
           type: "send",
@@ -63,7 +59,7 @@ defmodule RaiEx.BlockTest do
       assert block.signature === @valid_send["signature"]
     end
 
-    test "correctly signs a receive block", %{priv: priv, pub: pub} do
+    test "signs a receive block", %{priv: priv, pub: pub} do
       block =
         %Block{
           type: "receive",
@@ -76,7 +72,7 @@ defmodule RaiEx.BlockTest do
       assert block.signature === @valid_recv["signature"]
     end
 
-    test "correctly signs an open block", %{priv: priv, pub: pub} do
+    test "signs an open block", %{priv: priv, pub: pub} do
       block =
         %Block{
           type: "open",
@@ -88,6 +84,49 @@ defmodule RaiEx.BlockTest do
 
       assert block.hash === @valid_open["hash"]
       assert block.signature === @valid_open["signature"]
+    end
+  end
+
+  describe "Block.process/1 " do
+    test "processes a send block", %{priv: priv, pub: pub} do
+      block =
+        %Block{
+          type: "send",
+          previous: @valid_send["previous"],
+          destination: @valid_send["destination"],
+          balance: 0
+        }
+        |> Block.sign(priv, pub)
+        |> Block.process()
+
+      assert block.state === :sent
+    end
+
+    test "processes a receive block", %{priv: priv, pub: pub} do
+      block =
+        %Block{
+          type: "receive",
+          previous: @valid_recv["previous"],
+          source: @valid_recv["source"],
+        }
+        |> Block.sign(priv, pub)
+        |> Block.process()
+
+      assert block.state === :sent
+    end
+
+    test "processes an open block", %{priv: priv, pub: pub} do
+      block =
+        %Block{
+          type: "open",
+          account: @valid_open["account"],
+          representative: @valid_open["representative"],
+          source: @valid_open["source"],
+        }
+        |> Block.sign(priv, pub)
+        |> Block.process()
+
+      assert block.state === :sent
     end
   end
 end
