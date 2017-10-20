@@ -25,6 +25,17 @@ defmodule RaiEx.BlockTest do
     "hash" => "5FA957F257DD62A4582A50E20206214D06F9E26167A11D76E60C392EC5695360"
   }
 
+  @valid_open %{
+    "account" => "xrb_34bmpi65zr967cdzy4uy4twu7mqs9nrm53r1penffmuex6ruqy8nxp7ms1h1",
+    "representative" => "xrb_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4",
+    "signature" => "3311DF8325D87D4C528541F6D572CDA1D93605A61FD5D50DA2102EC8B456DCC72D72D3371FE166BD7A3074C284C4AFCA8F0A934B74462126D1BBDB0C5BCF3408",
+    "source" => "FBC27450F270743B26630E7C8730B301105D4D26997372D94680360E99702825",
+    "type" => "open",
+    "work" => "e8907bfce904035a",
+    # non-standard, just for tests
+    "hash" => "1653FC490D5AE8786F659D646D49639F0DE13DCC98470D6FA3234D175B85526F"
+  }
+
   describe "Block.sign/3 " do
     setup _context do
       {priv, pub} = Tools.seed_account!(@seed, 0)
@@ -63,6 +74,20 @@ defmodule RaiEx.BlockTest do
 
       assert block.hash === @valid_recv["hash"]
       assert block.signature === @valid_recv["signature"]
+    end
+
+    test "correctly signs an open block", %{priv: priv, pub: pub} do
+      block =
+        %Block{
+          type: "open",
+          account: @valid_open["account"],
+          representative: @valid_open["representative"],
+          source: @valid_open["source"],
+        }
+        |> Block.sign(priv, pub)
+
+      assert block.hash === @valid_open["hash"]
+      assert block.signature === @valid_open["signature"]
     end
   end
 end
