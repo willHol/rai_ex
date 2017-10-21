@@ -1,5 +1,5 @@
 defmodule RaiEx.BlockTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   alias RaiEx.{Block, Tools}
 
   @seed "9F1D53E732E48F25F94711D5B22086778278624F715D9B2BEC8FB81134E7C904"
@@ -41,7 +41,7 @@ defmodule RaiEx.BlockTest do
     account = Tools.create_account!(pub)
 
     # Passed to all tests
-    {:ok, %{acc: account, priv: priv, pub: pub}}
+    {:ok, %{account: account, priv: priv, pub: pub}}
   end
 
   describe "Block.sign/3 " do
@@ -92,33 +92,47 @@ defmodule RaiEx.BlockTest do
 
     skip_offline()
 
-    test "processes a send block", %{priv: priv, pub: pub} do
+    test "processes a send block and then processes a receive block", %{account: account, priv: priv, pub: pub} do
+      {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
+
       block =
         %Block{
           type: "send",
-          previous: @valid_send["previous"],
-          destination: @valid_send["destination"],
+          previous: frontier,
+          destination: account,
           balance: 0
         }
         |> Block.sign(priv, pub)
         |> Block.process()
 
       assert block.state === :sent
-    end
 
-    skip_offline()
+      # Give some time for the node to validate
+      :timer.sleep(200)
 
-    test "processes a receive block", %{priv: priv, pub: pub} do
+      # Check if the block has been included
+      {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
+
+      assert frontier === block.hash
+
       block =
         %Block{
           type: "receive",
-          previous: @valid_recv["previous"],
-          source: @valid_recv["source"],
+          previous: frontier,
+          source: frontier,
         }
         |> Block.sign(priv, pub)
         |> Block.process()
 
       assert block.state === :sent
+
+      # Give some time for the node to validate
+      :timer.sleep(200)
+
+      # Check if the block has been included
+      {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
+
+      assert frontier === block.hash
     end
 
     skip_offline()
