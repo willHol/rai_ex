@@ -92,7 +92,7 @@ defmodule RaiEx.BlockTest do
 
     skip_offline()
 
-    test "processes a send block and then processes a receive block", %{account: account, priv: priv, pub: pub} do
+    test "processes a send block and then processes the receive block", %{account: account, priv: priv, pub: pub} do
       {:ok, %{"frontier" => frontier}} = RaiEx.account_info(account)
 
       block =
