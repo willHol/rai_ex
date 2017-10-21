@@ -51,8 +51,8 @@ defmodule RaiEx.Tools do
               open_account({priv, pub}, sent_hash)
           end
 
-        blocks
-        |> Enum.reduce(frontier, fn receive_hash, frontier ->
+        # _ is for credo unused values
+        _ = Enum.reduce(blocks, frontier, fn receive_hash, frontier ->
           block = 
             %Block{
               type: "receive",

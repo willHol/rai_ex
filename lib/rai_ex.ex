@@ -724,7 +724,7 @@ defmodule RaiEx do
   *enable_control* must be set to true
   """
   rpc :work_generate do
-    param "hash", :hash, [recv_time: 1200_000, timeout: 1200_000]
+    param "hash", :hash, [recv_time: 1_200_000, timeout: 1_200_000]
   end
 
   @doc """
