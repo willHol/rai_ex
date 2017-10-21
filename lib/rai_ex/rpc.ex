@@ -9,9 +9,6 @@ defmodule RaiEx.RPC do
   defmacro __using__(_opts) do
     quote do
       import RaiEx.RPC
-      
-      alias RaiEx.RPC
-      alias RaiEx.Tools.Validator
 
       @behaviour RPC
     end
@@ -80,7 +77,7 @@ defmodule RaiEx.RPC do
   def __build_keyword_func__(action, list, opts) do
     quote do
       def unquote(action) (unquote(RPC.__named_args_from_keyword__(__MODULE__, list))) do
-        Validator.validate_types!(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
+        RaiEx.Tools.Validator.validate_types!(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
 
         unquote(RPC.__named_args_from_keyword__(__MODULE__, list))
         |> Enum.into(%{})
@@ -95,7 +92,7 @@ defmodule RaiEx.RPC do
   def __build_seq_func__(action, list, opts) do
     quote do
       def unquote(action) (unquote_splicing(RPC.__seq_args_from_keyword__(__MODULE__, list))) do
-        Validator.validate_types!(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
+        RaiEx.Tools.Validator.validate_types!(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
 
         unquote(RPC.__named_args_from_keyword__(__MODULE__, list))
         |> Enum.into(%{})
