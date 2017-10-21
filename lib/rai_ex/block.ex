@@ -184,7 +184,7 @@ defmodule RaiEx.Block do
 
     hash = Blake2.hash2b(
       previous <>
-      RaiEx.Tools.address_to_public!(destination) <> <<balance::size(128)>>, 32
+      Tools.address_to_public!(destination) <> <<balance::size(128)>>, 32
     )
     signature = Ed25519.signature(hash, priv_key, pub_key)
 
@@ -225,8 +225,8 @@ defmodule RaiEx.Block do
 
     hash = Blake2.hash2b(
       source <>
-      RaiEx.Tools.address_to_public!(representative) <>
-      RaiEx.Tools.address_to_public!(account), 32
+      Tools.address_to_public!(representative) <>
+      Tools.address_to_public!(account), 32
     )
     signature = Ed25519.signature(hash, priv_key, pub_key)
 

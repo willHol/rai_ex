@@ -2,13 +2,18 @@ defmodule RaiEx.RPC do
   @moduledoc """
   This module provides macros for generating rpc-invoking functions.
   """
+
+  alias RaiEx.RPC
   
   @doc false
   defmacro __using__(_opts) do
     quote do
       import RaiEx.RPC
+      
+      alias RaiEx.RPC
+      alias RaiEx.Tools.Validator
 
-      @behaviour RaiEx.RPC
+      @behaviour RPC
     end
   end
 
@@ -51,8 +56,8 @@ defmodule RaiEx.RPC do
       opts = Module.get_attribute(__MODULE__, :"#{@current_action}_opts") || []
 
       Module.eval_quoted __ENV__, [
-        RaiEx.RPC.__build_keyword_func__(@current_action, param_to_type_keywords, opts),
-        RaiEx.RPC.__build_seq_func__(@current_action, param_to_type_keywords, opts)
+        RPC.__build_keyword_func__(@current_action, param_to_type_keywords, opts),
+        RPC.__build_seq_func__(@current_action, param_to_type_keywords, opts)
       ]
     end
   end
@@ -74,10 +79,10 @@ defmodule RaiEx.RPC do
   @doc false
   def __build_keyword_func__(action, list, opts) do
     quote do
-      def unquote(action) (unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list))) do
-        RaiEx.Tools.Validator.validate_types!(unquote(list), unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list)))
+      def unquote(action) (unquote(RPC.__named_args_from_keyword__(__MODULE__, list))) do
+        Validator.validate_types!(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
 
-        unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list))
+        unquote(RPC.__named_args_from_keyword__(__MODULE__, list))
         |> Enum.into(%{})
         |> Map.put(:action, unquote(action))
         |> Poison.encode!
@@ -89,10 +94,10 @@ defmodule RaiEx.RPC do
   @doc false
   def __build_seq_func__(action, list, opts) do
     quote do
-      def unquote(action) (unquote_splicing(RaiEx.RPC.__seq_args_from_keyword__(__MODULE__, list))) do
-        RaiEx.Tools.Validator.validate_types!(unquote(list), unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list)))
+      def unquote(action) (unquote_splicing(RPC.__seq_args_from_keyword__(__MODULE__, list))) do
+        Validator.validate_types!(unquote(list), unquote(RPC.__named_args_from_keyword__(__MODULE__, list)))
 
-        unquote(RaiEx.RPC.__named_args_from_keyword__(__MODULE__, list))
+        unquote(RPC.__named_args_from_keyword__(__MODULE__, list))
         |> Enum.into(%{})
         |> Map.put(:action, unquote(action))
         |> Poison.encode!

@@ -5,7 +5,8 @@ defmodule RaiEx.Tools do
 
   import RaiEx.Helpers
 
-  alias RaiEx.{Block, Tools}
+  alias RaiEx.Block
+  alias RaiEx.Tools.Base32
 
   @delay 200
 
@@ -170,7 +171,7 @@ defmodule RaiEx.Tools do
         |> address_to_public!()
         |> hash_checksum!()
 
-      attached_checksum = checksum |> Tools.Base32.decode!() |> reverse()
+      attached_checksum = checksum |> Base32.decode!() |> reverse()
       
       computed_checksum == attached_checksum
     rescue
@@ -193,7 +194,7 @@ defmodule RaiEx.Tools do
     binary =
       address
       |> String.trim("xrb_")
-      |> Tools.Base32.decode!()
+      |> Base32.decode!()
 
     <<_drop::size(4), pub_key::binary>> = binary
 
@@ -224,12 +225,12 @@ defmodule RaiEx.Tools do
       pub_key
       |> hash_checksum!()
       |> reverse()
-      |> Tools.Base32.encode!()
+      |> Base32.encode!()
 
     encoded_address =
       pub_key
       |> left_pad_binary(4)
-      |> Tools.Base32.encode!()
+      |> Base32.encode!()
 
     "xrb_#{encoded_address <> encoded_check}"
   end
