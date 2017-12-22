@@ -58,7 +58,7 @@ defmodule RaiEx.Tools do
   end
   def raw_to_units(raw, min_digits) do
     Enum.each(@units, fn {unit, _} ->
-      div = raw_to_units(raw, unit)
+      {div, _} = raw_to_units(raw, unit)
 
       if integer_part_digits(div) >= min_digits do
         throw {div, unit}
