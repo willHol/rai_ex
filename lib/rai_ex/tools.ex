@@ -11,14 +11,14 @@ defmodule RaiEx.Tools do
   @delay 200
   @zero Decimal.new(0)
 
-  @units %{
+  @units [
     Gxrb: 1000000000000000000000000000000000,
     Mxrb: 1000000000000000000000000000000,
     kxrb: 1000000000000000000000000000,
     xrb:  1000000000000000000000000,
     mxrb: 1000000000000000000000,
     uxrb: 1000000000000000000
-  }
+  ]
 
   @doc """
   Generates a wallet seed.
