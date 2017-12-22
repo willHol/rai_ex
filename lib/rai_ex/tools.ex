@@ -12,12 +12,12 @@ defmodule RaiEx.Tools do
   @zero Decimal.new(0)
 
   @units [
-    Gxrb: 1000000000000000000000000000000000,
-    Mxrb: 1000000000000000000000000000000,
-    kxrb: 1000000000000000000000000000,
-    xrb:  1000000000000000000000000,
-    mxrb: 1000000000000000000000,
-    uxrb: 1000000000000000000
+    GXRB: 1000000000000000000000000000000000,
+    MXRB: 1000000000000000000000000000000,
+    kXRB: 1000000000000000000000000000,
+    XRB:  1000000000000000000000000,
+    mXRB: 1000000000000000000000,
+    uXRB: 1000000000000000000
   ]
 
   @doc """
@@ -31,7 +31,7 @@ defmodule RaiEx.Tools do
   Converts RaiBlocks raw amounts to metric prefixed amounts. The second argument
   to `raw_to_units/2` can optionally specify the minimum number of integer
   digits to occur in the converted amount. Alternatively if the second argument
-  is one of `:Gxrb`, `:Mxrb`, `:kxrb`, `:xrb`, `:mxrb` or `:uxrb` then the raw
+  is one of `:GXRB`, `:MXRB`, `:kXRB`, `:XRB`, `:mXRB` or `:uXRB` then the raw
   amount will be converted to the relevant unit.
 
   ## Examples
