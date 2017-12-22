@@ -9,12 +9,79 @@ defmodule RaiEx.Tools do
   alias RaiEx.Tools.Base32
 
   @delay 200
+  @zero Decimal.new(0)
+
+  @units %{
+    Gxrb: 1000000000000000000000000000000000,
+    Mxrb: 1000000000000000000000000000000,
+    kxrb: 1000000000000000000000000000,
+    xrb:  1000000000000000000000000,
+    mxrb: 1000000000000000000000,
+    uxrb: 1000000000000000000
+  }
 
   @doc """
   Generates a wallet seed.
   """
   def seed do
     :crypto.strong_rand_bytes(32)
+  end
+
+  @doc """
+  Converts RaiBlocks raw amounts to metric prefixed amounts. The second argument
+  to `raw_to_units/2` can optionally specify the minimum number of integer
+  digits to occur in the converted amount. Alternatively if the second argument
+  is one of `:Gxrb`, `:Mxrb`, `:kxrb`, `:xrb`, `:mxrb` or `:uxrb` then the raw
+  amount will be converted to the relevant unit.
+
+  ## Examples
+
+      iex> raw_to_units(10000000000000000000)
+      {#Decimal<10>, :uxrb}
+
+      iex> raw_to_units(Decimal.new(10000000000000000000000))
+      {#Decimal<10>, :mxrb}
+
+      iex> raw_to_units(10000000000000000000000, 3)
+      {#Decimal<10000>, :uxrb}
+
+      iex> raw_to_units(10000000000000000000000, :xrb)
+      #Decimal<0.01>
+
+  """
+  def raw_to_units(raw, min_digits \\ 1)
+  def raw_to_units(raw, arg) when is_integer(raw) do
+    raw_to_units(Decimal.new(raw), arg)
+  end
+  def raw_to_units(raw, unit) when is_atom(unit) do
+    {Decimal.div(raw, Decimal.new(@units[unit] || 1)), unit}
+  end
+  def raw_to_units(raw, min_digits) do
+    Enum.each(@units, fn {unit, _} ->
+      div = raw_to_units(raw, unit)
+
+      if integer_part_digits(div) >= min_digits do
+        throw {div, unit}
+      end
+    end)
+
+    {raw, :raw}
+  catch
+    result -> result
+  end
+
+  # Returns the number of digits in the integer part
+  def integer_part_digits(@zero), do: 0
+  def integer_part_digits(%Decimal{} = num) do
+    rounded = Decimal.round(num, 0, :floor)
+
+    if Decimal.cmp(rounded, @zero) !== :eq do
+      rounded
+      |> Decimal.to_string()
+      |> String.length()
+    else
+      0
+    end
   end
 
   @doc """
