@@ -70,6 +70,17 @@ defmodule RaiEx.Tools do
     result -> result
   end
 
+  @doc """
+  Converts various RaiBlocks units to raw units.
+  """
+  def units_to_raw(amount, unit) when is_integer(amount) do
+    units_to_raw(Decimal.new(amount), unit)
+  end
+  def units_to_raw(amount, unit) do
+    multiplier = @units[unit] || 1
+    Decimal.mult(amount, Decimal.new(multiplier))
+  end
+
   # Returns the number of digits in the integer part
   def integer_part_digits(@zero), do: 0
   def integer_part_digits(%Decimal{} = num) do
