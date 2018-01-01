@@ -19,7 +19,7 @@ defmodule RaiEx.CircuitBreaker do
   end
 
   def post(url, body, headers \\ [], opts \\ []) do
-    GenServer.call(__MODULE__, {:post, url, body, headers, opts})
+    GenServer.call(__MODULE__, {:post, url, body, headers, opts}, :infinity)
   end
 
   # ==== GENSERVER CALLBACKS ==== #
