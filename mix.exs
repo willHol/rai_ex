@@ -22,6 +22,7 @@ defmodule RaiEx.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      mod: {RaiEx.Application, []},
       extra_applications: [:logger, :httpoison]
     ]
   end
@@ -52,11 +53,11 @@ defmodule RaiEx.Mixfile do
     [
       {:poison, "~> 3.1"},
       {:httpoison, "~> 0.13.0"},
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:decimal, "~> 1.4"},
       {:blake2, "~> 1.0"},
       {:ed25519, "~> 1.1"},
       {:credo, "~> 0.8.8", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:inch_ex, "~> 0.5.6", only: [:dev, :test]}
     ]
   end
