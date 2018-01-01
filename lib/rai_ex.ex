@@ -813,9 +813,7 @@ defmodule RaiEx do
       {:error, reason}
 
   """
-  def post_json_rpc(json, opts \\ [], tries \\ @retry_count, prev_reason \\ {:error, :unknown})
-  def post_json_rpc(_json, _opts, 0, reason), do: {:error, reason}
-  def post_json_rpc(json, opts, tries, _prev_reason) do
+  def post_json_rpc(json, opts) do
     comb_opts = Keyword.merge(@options, opts)
 
     with {:ok, body} <- RaiEx.CircuitBreaker.post(get_url(), json, @headers, comb_opts),
@@ -823,13 +821,14 @@ defmodule RaiEx do
          do
           case map do
             # Returns rpc errors as error tuples
-            %{"error" => e} -> {:error, e}
-            _ -> {:ok, map}
+            %{"error" => e} ->
+              {:error, e}
+            _ ->
+              {:ok, map}
           end
          else
           {:error, reason} ->
-            :timer.sleep(@wait_time)
-            post_json_rpc(json, opts, tries - 1, reason)
+            {:error, reason}
           :blown ->
             {:error, :blown}
          end
