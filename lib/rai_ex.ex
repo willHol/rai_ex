@@ -36,7 +36,7 @@ defmodule RaiEx do
   alias HTTPoison.Error
 
   @headers [{"Content-Type", "application/json"}]
-  @options [recv_time: 5000, timeout: 10_000]
+  @options [recv_time: 5000, timeout: 10_000, hackney: [pool: :rai_dice]]
   @default_url "http://localhost:7076"
   @wait_time 75
   @retry_count 3
@@ -818,7 +818,7 @@ defmodule RaiEx do
   def post_json_rpc(json, opts, tries, _prev_reason) do
     comb_opts = Keyword.merge(@options, opts)
 
-    with {:ok, %Response{status_code: 200, body: body}} <- request(:post, get_url(), json, @headers, comb_opts),
+    with {:ok, body} <- RaiEx.CircuitBreaker.post(get_url(), json, @headers, comb_opts),
          {:ok, map} <- Poison.decode(body)
          do
           case map do
@@ -827,9 +827,11 @@ defmodule RaiEx do
             _ -> {:ok, map}
           end
          else
-          {:error, %Error{reason: reason}} ->
+          {:error, reason} ->
             :timer.sleep(@wait_time)
             post_json_rpc(json, opts, tries - 1, reason)
+          :blown ->
+            {:error, :blown}
          end
     end
 end
