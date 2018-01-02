@@ -815,7 +815,7 @@ defmodule RaiEx do
 
   """
   def post_json_rpc(json, opts) do
-    env_opts = Application.put_env(:rai_ex, :opts, opts)
+    env_opts = Application.get_env(:rai_ex, :opts, opts)
     comb_opts = Keyword.merge(Keyword.merge(@options, env_opts), opts)
 
     with {:ok, body} <- RaiEx.CircuitBreaker.post(get_url(), json, @headers, comb_opts),
