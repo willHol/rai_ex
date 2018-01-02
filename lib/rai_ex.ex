@@ -45,7 +45,7 @@ defmodule RaiEx do
   Used to connect to a different endpoint.
   """
   def connect(url \\ @default_url, opts \\ []) do
-    Application.put_env(:rai_ex, :url, parse_url(url))
+    Application.put_env(:rai_ex, :url, url)
     Application.put_env(:rai_ex, :opts, opts)
   end
 
@@ -781,17 +781,6 @@ defmodule RaiEx do
   rpc :work_validate do
     param "work", :string
     param "hash", :hash
-  end
-
-  # Parses a URL into its fully qualified form
-  defp parse_url(url) do
-    case url |> String.splitter(["://", ":"]) |> Enum.take(3) do
-      ["http", "localhost", port] -> "http://#{local_host()}:#{port}"
-      ["http", host, port] -> "http://#{host}:#{port}"
-      ["http", host] -> "http://#{host}:#{default_port()}"
-      [host, port] -> "http://#{host}:#{port}"
-      [host] -> "http://#{host}:#{default_port()}"
-    end
   end
 
   defp default_port, do: Application.get_env(:rai_ex, :default_port, 7075)
