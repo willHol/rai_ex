@@ -39,13 +39,14 @@ defmodule RaiEx do
   @options [recv_time: 5000, timeout: 10_000, hackney: [pool: :rai_dice]]
   @default_url "http://localhost:7076"
   @wait_time 75
-  @retry_count 3
+  @retry_count 2
 
   @doc """
   Used to connect to a different endpoint.
   """
-  def connect(url \\ @default_url) do
+  def connect(url \\ @default_url, opts \\ []) do
     Application.put_env(:rai_ex, :url, parse_url(url))
+    Application.put_env(:rai_ex, :opts, opts)
   end
 
   @doc """
@@ -814,7 +815,8 @@ defmodule RaiEx do
 
   """
   def post_json_rpc(json, opts) do
-    comb_opts = Keyword.merge(@options, opts)
+    env_opts = Application.put_env(:rai_ex, :opts, opts)
+    comb_opts = Keyword.merge(Keyword.merge(@options, env_opts), opts)
 
     with {:ok, body} <- RaiEx.CircuitBreaker.post(get_url(), json, @headers, comb_opts),
          {:ok, map} <- Poison.decode(body)
