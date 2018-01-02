@@ -126,7 +126,7 @@ defmodule RaiEx.Tools do
             {:ok, %{"frontier" => frontier}} ->
               frontier
             {:error, "Account not found"} ->
-              [sent_hash] = blocks
+              [sent_hash] = Enum.take(blocks, 1)
               open_account({priv, pub}, sent_hash)
           end
 
