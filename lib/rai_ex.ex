@@ -36,7 +36,7 @@ defmodule RaiEx do
   alias HTTPoison.Error
 
   @headers [{"Content-Type", "application/json"}]
-  @options [recv_time: 5000, timeout: 10_000, hackney: [pool: :rai_dice]]
+  @options [recv_timeout: 5000, timeout: 10_000, hackney: [pool: :rai_dice]]
   @default_url "http://localhost:7076"
   @wait_time 75
   @retry_count 2
@@ -725,7 +725,7 @@ defmodule RaiEx do
   *enable_control* must be set to true
   """
   rpc :work_generate do
-    param "hash", :hash, [recv_time: 1_200_000, timeout: 1_200_000]
+    param "hash", :hash, [recv_timeout: 1_200_000, timeout: 1_200_000]
   end
 
   @doc """
