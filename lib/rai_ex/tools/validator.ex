@@ -14,6 +14,7 @@ defmodule RaiEx.Tools.Validator do
     :block => {__MODULE__, :is_hash},
     :address => {__MODULE__, :is_address},
     :address_list => {__MODULE__, :is_address_list},
+    :boolean => {Kernel, :is_boolean},
     :any => {__MODULE__, :any}
   }
 
