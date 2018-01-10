@@ -525,15 +525,7 @@ defmodule RaiEx do
   rpc :pending do
     param "account", :address
     param "count", :integer
-  end
-
-  @doc """
-  Returns a list of pending block hashes with amount more or equal to threshold.
-  """
-  rpc :pending do
-    param "account", :address
-    param "count", :integer
-    param "threshold", :number
+    param "threshold", :integer
   end
 
   @doc """
@@ -785,7 +777,12 @@ defmodule RaiEx do
     param "hash", :hash
   end
 
-  defp get_url(), do: Application.get_env(:rai_ex, :url, @default_url)
+  defp get_url() do
+    url = Application.get_env(:rai_ex, :url, @default_url)
+    port = Application.get_env(:rai_ex, :port, @default_url)
+
+    "#{url}:#{port}"
+  end
 
   @doc """
   Posts some json to the RaiBlocks rpc. Callback implementation for `RaiEx.RPC`.

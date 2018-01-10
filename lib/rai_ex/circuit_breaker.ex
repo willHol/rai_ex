@@ -8,7 +8,7 @@ defmodule RaiEx.CircuitBreaker do
   alias HTTPoison.Error
 
   @max_error Application.get_env(:rai_dice, :breaker_max_error, 3)
-  @period Application.get_env(:rai_dice, :breaker_time_period, 1000)
+  @period Application.get_env(:rai_dice, :breaker_period, 1000)
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)

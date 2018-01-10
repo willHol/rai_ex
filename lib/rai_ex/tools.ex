@@ -115,10 +115,10 @@ defmodule RaiEx.Tools do
     |> Block.send()
   end
 
-  def process_all_pending({priv, pub}) do
+  def process_all_pending({priv, pub}, amount \\ 1000) do
     account = create_account!(pub)
 
-    case RaiEx.pending(account, 1000) do
+    case RaiEx.pending(account, amount, min_recv()) do
       {:ok, %{"blocks" => ""}} -> :ok
       {:ok, %{"blocks" => blocks}} ->
         frontier =

@@ -3,5 +3,8 @@
 use Mix.Config
 
 config :rai_ex,
-  default_port: 7076,
-  localhost: "127.0.0.1"
+  url: "http://localhost",
+  port: 7076,
+  min_receive: 1_000_000_000_000_000_000_000_000,
+  breaker_max_error: 3,
+  breaker_period: 1000

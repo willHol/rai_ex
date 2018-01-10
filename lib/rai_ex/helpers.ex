@@ -1,6 +1,8 @@
 defmodule RaiEx.Helpers do
   @moduledoc false
 
+  def min_recv(), do: Application.get_env(:rai_dice, :min_receive, 1_000_000_000_000_000_000_000_000)
+
   def if_string_hex_to_binary([]), do: []
   def if_string_hex_to_binary(binaries) when is_list(binaries) do
     [binary | rest] = binaries
