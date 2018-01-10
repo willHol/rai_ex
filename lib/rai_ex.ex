@@ -38,8 +38,6 @@ defmodule RaiEx do
   @headers [{"Content-Type", "application/json"}]
   @options [recv_timeout: 5000, timeout: 10_000, hackney: [pool: :rai_dice]]
   @default_url "http://localhost:7076"
-  @wait_time 75
-  @retry_count 2
 
   @doc """
   Used to connect to a different endpoint.
@@ -790,9 +788,7 @@ defmodule RaiEx do
   defp get_url, do: Application.get_env(:rai_ex, :url, @default_url)
 
   @doc """
-  Posts some json to the RaiBlocks rpc. If the POST is unsuccessful,
-  it is re-sent `@retry_count` many times with a delay of `@wait_time`
-  between retries. Callback implementation for `RaiEx.RPC`.
+  Posts some json to the RaiBlocks rpc. Callback implementation for `RaiEx.RPC`.
 
   ## Examples
 
