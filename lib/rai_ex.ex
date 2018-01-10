@@ -27,6 +27,10 @@ defmodule RaiEx do
       iex> RaiEx.wallet_create()
       {:error, reason}
 
+      # Connection is blown
+      iex> RaiEx.wallet_create()
+      {:error, :blown}
+
   """
 
   import HTTPoison
