@@ -3,19 +3,71 @@ defmodule RaiEx.Tools.Base32 do
   This module provides functions for dealing with encoding and decoding, RaiDice base32.
   """
 
-  @mappings (
-    {_i, mappings} =
-      "13456789abcdefghijkmnopqrstuwxyz"
-      |> String.split("", trim: true)
-      |> Enum.reduce({0, %{}}, fn letter, {i, map} -> 
-          {
-            i + 1,
-            Map.merge(map, %{letter => <<i :: size(5)>>, <<i :: size(5)>> => letter})
-          }
-         end)
+  defp char_to_bin("1"), do: <<0::5>>
+  defp char_to_bin("3"), do: <<1::5>>
+  defp char_to_bin("4"), do: <<2::5>>
+  defp char_to_bin("5"), do: <<3::5>>
+  defp char_to_bin("6"), do: <<4::5>>
+  defp char_to_bin("7"), do: <<5::5>>
+  defp char_to_bin("8"), do: <<6::5>>
+  defp char_to_bin("9"), do: <<7::5>>
+  defp char_to_bin("a"), do: <<8::5>>
+  defp char_to_bin("b"), do: <<9::5>>
+  defp char_to_bin("c"), do: <<10::5>>
+  defp char_to_bin("d"), do: <<11::5>>
+  defp char_to_bin("e"), do: <<12::5>>
+  defp char_to_bin("f"), do: <<13::5>>
+  defp char_to_bin("g"), do: <<14::5>>
+  defp char_to_bin("h"), do: <<15::5>>
+  defp char_to_bin("i"), do: <<16::5>>
+  defp char_to_bin("j"), do: <<17::5>>
+  defp char_to_bin("k"), do: <<18::5>>
+  defp char_to_bin("m"), do: <<19::5>>
+  defp char_to_bin("n"), do: <<20::5>>
+  defp char_to_bin("o"), do: <<21::5>>
+  defp char_to_bin("p"), do: <<22::5>>
+  defp char_to_bin("q"), do: <<23::5>>
+  defp char_to_bin("r"), do: <<24::5>>
+  defp char_to_bin("s"), do: <<25::5>>
+  defp char_to_bin("t"), do: <<26::5>>
+  defp char_to_bin("u"), do: <<27::5>>
+  defp char_to_bin("w"), do: <<28::5>>
+  defp char_to_bin("x"), do: <<29::5>>
+  defp char_to_bin("y"), do: <<30::5>>
+  defp char_to_bin("z"), do: <<31::5>>
 
-    mappings
-  )
+  defp bin_to_char(<<0::5>>), do: "1"
+  defp bin_to_char(<<1::5>>), do: "3"
+  defp bin_to_char(<<2::5>>), do: "4"
+  defp bin_to_char(<<3::5>>), do: "5"
+  defp bin_to_char(<<4::5>>), do: "6"
+  defp bin_to_char(<<5::5>>), do: "7"
+  defp bin_to_char(<<6::5>>), do: "8"
+  defp bin_to_char(<<7::5>>), do: "9"
+  defp bin_to_char(<<8::5>>), do: "a"
+  defp bin_to_char(<<9::5>>), do: "b"
+  defp bin_to_char(<<10::5>>), do: "c"
+  defp bin_to_char(<<11::5>>), do: "d"
+  defp bin_to_char(<<12::5>>), do: "e"
+  defp bin_to_char(<<13::5>>), do: "f"
+  defp bin_to_char(<<14::5>>), do: "g"
+  defp bin_to_char(<<15::5>>), do: "h"
+  defp bin_to_char(<<16::5>>), do: "i"
+  defp bin_to_char(<<17::5>>), do: "j"
+  defp bin_to_char(<<18::5>>), do: "k"
+  defp bin_to_char(<<19::5>>), do: "m"
+  defp bin_to_char(<<20::5>>), do: "n"
+  defp bin_to_char(<<21::5>>), do: "o"
+  defp bin_to_char(<<22::5>>), do: "p"
+  defp bin_to_char(<<23::5>>), do: "q"
+  defp bin_to_char(<<24::5>>), do: "r"
+  defp bin_to_char(<<25::5>>), do: "s"
+  defp bin_to_char(<<26::5>>), do: "t"
+  defp bin_to_char(<<27::5>>), do: "u"
+  defp bin_to_char(<<28::5>>), do: "w"
+  defp bin_to_char(<<29::5>>), do: "x"
+  defp bin_to_char(<<30::5>>), do: "y"
+  defp bin_to_char(<<31::5>>), do: "z"
 
   @doc """
   Returns true if the binary can be encoded into base32.
@@ -39,7 +91,7 @@ defmodule RaiEx.Tools.Base32 do
   def decode!(string) do
     string
     |> String.split("", trim: true)
-    |> Enum.reduce(<<>>, &(<<&2::bitstring, @mappings[&1]::bitstring>>))
+    |> Enum.reduce(<<>>, &(<<&2::bitstring, char_to_bin(&1)::bitstring>>))
   end
 
   @doc """
@@ -83,7 +135,7 @@ defmodule RaiEx.Tools.Base32 do
   end
   def encode!(bitstring, acc) do
     <<letter::size(5), rest::bitstring>> = bitstring
-    encode!(rest, acc <> @mappings[<<letter::size(5)>>])
+    encode!(rest, acc <> bin_to_char(<<letter::size(5)>>))
   end
 
   @doc """
@@ -105,14 +157,4 @@ defmodule RaiEx.Tools.Base32 do
       _e in ArgumentError -> {:error, :badarg}
     end
   end
-
-  @doc """
-  Returns a duplexed map of **character <-> bitstring** mappings.
-
-  ## Example
-
-      %{"1" => <<0::size(5)>>, <0::size(5)>> => "1"}
-
-  """
-  def character_mappings, do: @mappings
 end

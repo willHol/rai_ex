@@ -148,7 +148,7 @@ defmodule RaiEx.BlockTest do
         |> Block.sign(priv, pub)
         |> Block.process()
 
-      assert block.state === :sent
+      assert block.state === {:error, "Old block"}
     end
   end
 end
