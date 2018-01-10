@@ -781,11 +781,7 @@ defmodule RaiEx do
     param "hash", :hash
   end
 
-  defp default_port, do: Application.get_env(:rai_ex, :default_port, 7075)
-
-  defp local_host, do: Application.get_env(:rai_ex, :localhost, "127.0.0.1")
-
-  defp get_url, do: Application.get_env(:rai_ex, :url, @default_url)
+  defp get_url(), do: Application.get_env(:rai_ex, :url, @default_url)
 
   @doc """
   Posts some json to the RaiBlocks rpc. Callback implementation for `RaiEx.RPC`.
