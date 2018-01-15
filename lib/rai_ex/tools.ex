@@ -131,7 +131,7 @@ defmodule RaiEx.Tools do
           end
 
         # _ is for credo unused values
-        _ = Enum.reduce(blocks, frontier, fn receive_hash, frontier ->
+        _ = Enum.reduce(blocks, frontier, fn {receive_hash, _amount}, frontier ->
           block = 
             %Block{
               type: "receive",
